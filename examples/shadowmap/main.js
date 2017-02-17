@@ -663,6 +663,7 @@
                     w: 110,
                     h: 110
                 } );
+
                 this.showDebugTextureList();
             }
 

@@ -219,7 +219,6 @@
 
             if ( !this._programRTT ) {
 
-
                 var vertexShader = [
                     '',
                     'attribute vec3 Vertex;',
@@ -234,11 +233,20 @@
                     ''
                 ].join( '\n' );
 
-                var fgt = [
-                    osgUtil.Composer.Filter.defaultFragmentShaderHeader, 'void main (void)', '{', '  gl_FragColor = texture2D(Texture0, vTexCoord0);', '}', ''
+                var fragmentShader = [
+                    '#ifdef GL_FRAGMENT_PRECISION_HIGH\n precision highp float;\n #else\n precision mediump float;\n#endif',
+                    'varying vec2 vTexCoord0;',
+                    'uniform vec2 RenderSize;',
+                    'uniform sampler2D Texture0;',
+                    'void main (void) {',
+                    '  gl_FragColor = texture2D(Texture0, vTexCoord0);',
+                    '}',
+                    ''
                 ].join( '\n' );
+
                 var program = new osg.Program(
-                    new osg.Shader( 'VERTEX_SHADER', vertexShader ), new osg.Shader( 'FRAGMENT_SHADER', fgt ) );
+                    new osg.Shader( 'VERTEX_SHADER', vertexShader ),
+                    new osg.Shader( 'FRAGMENT_SHADER', fragmentShader ) );
 
                 this._programRTT = program;
             }
