@@ -421,7 +421,7 @@ MACROUTILS.createPrototypeObject(
             return true;
         },
 
-        updateShadowTechnique: function(nv, viewportDimension) {
+        updateShadowTechnique: function(nv, viewportDimension, frameBufferObject) {
             var camera = this._cameraShadow;
             var texture = this._texture;
 
@@ -441,38 +441,26 @@ MACROUTILS.createPrototypeObject(
                         vp.width() !== viewportDimension[2] ||
                         vp.height() !== viewportDimension[3]
                     ) {
-                        camera.detachAll();
-
-                        camera.attachTexture(FrameBufferObject.COLOR_ATTACHMENT0, texture);
-                        camera.attachRenderBuffer(
-                            FrameBufferObject.DEPTH_ATTACHMENT,
-                            FrameBufferObject.DEPTH_COMPONENT16
+                        camera.setFrameBufferObject(frameBufferObject);
+                        vp.setViewport(
+                            viewportDimension[0],
+                            viewportDimension[1],
+                            viewportDimension[2],
+                            viewportDimension[3]
                         );
-
-                        camera
-                            .getViewport()
-                            .setViewport(
-                                viewportDimension[0],
-                                viewportDimension[1],
-                                viewportDimension[2],
-                                viewportDimension[3]
-                            );
                     }
-                } else {
+                } else if (
+                    vp.width() !== texture.getWidth() ||
+                    vp.height() !== texture.getHeight()
+                ) {
                     // if texture size changed update the camera rtt params
-                    if (vp.width() !== texture.getWidth() || vp.height() !== texture.getHeight()) {
-                        camera.detachAll();
-
-                        camera.attachTexture(FrameBufferObject.COLOR_ATTACHMENT0, texture);
-                        camera.attachRenderBuffer(
-                            FrameBufferObject.DEPTH_ATTACHMENT,
-                            FrameBufferObject.DEPTH_COMPONENT16
-                        );
-
-                        camera
-                            .getViewport()
-                            .setViewport(0, 0, texture.getWidth(), texture.getHeight());
-                    }
+                    camera.detachAll();
+                    camera.attachTexture(FrameBufferObject.COLOR_ATTACHMENT0, texture);
+                    camera.attachRenderBuffer(
+                        FrameBufferObject.DEPTH_ATTACHMENT,
+                        FrameBufferObject.DEPTH_COMPONENT16
+                    );
+                    vp.setViewport(0, 0, texture.getWidth(), texture.getHeight());
                 }
             }
         },
@@ -841,12 +829,10 @@ MACROUTILS.createPrototypeObject(
             this._depthRange[3] = 1.0 / this._depthRange[2];
 
             if (this._lightNumberArrayIndex !== -1) {
-                this._texture.setViewMatrix(this._lightNumberArrayIndex, this._viewMatrix);
-                this._texture.setProjectionMatrix(
-                    this._lightNumberArrayIndex,
-                    this._projectionMatrix
-                );
-                this._texture.setDepthRange(this._lightNumberArrayIndex, this._depthRange);
+                var lNum = this._light.getLightNumber();
+                this._texture.setViewMatrix(lNum, this._viewMatrix);
+                this._texture.setProjectionMatrix(lNum, this._projectionMatrix);
+                this._texture.setDepthRange(lNum, this._depthRange);
             } else {
                 this._texture.setViewMatrix(this._viewMatrix);
                 this._texture.setProjectionMatrix(this._projectionMatrix);
@@ -873,11 +859,9 @@ MACROUTILS.createPrototypeObject(
             mat4.copy(this._viewMatrix, camera.getViewMatrix());
 
             if (this._lightNumberArrayIndex !== -1) {
-                this._texture.setViewMatrix(this._lightNumberArrayIndex, this._viewMatrix);
-                this._texture.setProjectionMatrix(
-                    this._lightNumberArrayIndex,
-                    this._projectionMatrix
-                );
+                var lNum = this._light.getLightNumber();
+                this._texture.setViewMatrix(lNum, this._viewMatrix);
+                this._texture.setProjectionMatrix(lNum, this._projectionMatrix);
             } else {
                 this._texture.setViewMatrix(this._viewMatrix);
                 this._texture.setProjectionMatrix(this._projectionMatrix);
@@ -946,8 +930,19 @@ MACROUTILS.createPrototypeObject(
             this._filledOnce = true;
         },
 
-        cleanReceivingStateSet: function() {
+        cleanReceivingStateSet: function(ignoreTexture) {
             if (this._receivingStateset) {
+                if (
+                    this._receivingStateset.getAttribute(
+                        this._shadowReceiveAttribute.getTypeMember()
+                    ) === this._shadowReceiveAttribute
+                )
+                    this._receivingStateset.removeAttribute(
+                        this._shadowReceiveAttribute.getTypeMember()
+                    );
+
+                if (ignoreTexture) return;
+
                 if (this._texture) {
                     // remove this._texture, but not if it's not this._texture
                     if (
@@ -961,23 +956,14 @@ MACROUTILS.createPrototypeObject(
                             this._texture.getTypeMember()
                         );
                 }
-
-                if (
-                    this._receivingStateset.getAttribute(
-                        this._shadowReceiveAttribute.getTypeMember()
-                    ) === this._shadowReceiveAttribute
-                )
-                    this._receivingStateset.removeAttribute(
-                        this._shadowReceiveAttribute.getTypeMember()
-                    );
             }
         },
-        cleanSceneGraph: function() {
+        cleanSceneGraph: function(ignoreTexture) {
             // well release a lot more things when it works
             this._cameraShadow = undefined;
             this._filledOnce = false;
 
-            this.cleanReceivingStateSet();
+            this.cleanReceivingStateSet(ignoreTexture);
 
             // TODO: need state
             //this._texture.releaseGLObjects();
@@ -1010,6 +996,13 @@ MACROUTILS.createPrototypeObject(
         },
         getDebug: function() {
             return this._debug;
+        },
+        getLightNumber: function() {
+            return this._light.getLightNumber();
+        },
+
+        getLight: function() {
+            return this._light;
         }
     }),
     'osgShadow',
