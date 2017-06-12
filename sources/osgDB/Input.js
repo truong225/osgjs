@@ -223,6 +223,8 @@ Input.prototype = {
             return options.readNodeURL.call( this, url, options );
         }
 
+        MACROUTILS.time( 'osgjs.metric:Input.readNodeURL');
+
         url = this.computeURL( url );
 
         var defer = P.defer();
@@ -324,6 +326,10 @@ Input.prototype = {
             defer.reject();
 
         } ).done();
+
+        defer.promise.finally( function () {
+            MACROUTILS.timeEnd( 'osgjs.metric:Input.readNodeURL' );
+        } );
 
         return defer.promise;
     },
