@@ -220,6 +220,7 @@ Input.prototype = {
             return options.readNodeURL.call( this, url, options );
         }
 
+        MACROUTILS.time( 'osgjs.metric:Input.readNodeURL');
         url = this.computeURL( url );
 
         return new P( function ( resolve, reject ) {
@@ -319,7 +320,9 @@ Input.prototype = {
                 reject();
             } );
 
-        }.bind( this ) );
+        }.bind( this ) ).finally( function() {
+            MACROUTILS.timeEnd( 'osgjs.metric:Input.readNodeURL');
+        } );
     },
 
     _unzipTypedArray: function ( binary ) {
