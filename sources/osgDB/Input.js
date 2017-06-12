@@ -140,7 +140,7 @@ Input.prototype = {
         return new( scope )();
     },
 
-    fetchImage: function ( image, url, options, defer ) {
+    fetchImage: function ( image, url, options, resolve ) {
         var checkInlineImage = 'data:image/';
         // crossOrigin does not work for inline data image
         var isInlineImage = ( url.substring( 0, checkInlineImage.length ) === checkInlineImage );
@@ -148,8 +148,8 @@ Input.prototype = {
         img.onerror = function () {
             Notify.warn( 'warning use white texture as fallback instead of ' + url );
             image.setImage( Input.imageFallback );
-            if ( defer ) {
-                defer.resolve( image );
+            if ( typeof resolve === 'function' ) {
+                resolve( image );
             }
         };
 
@@ -158,10 +158,9 @@ Input.prototype = {
         }
 
         img.onload = function () {
-
-            if ( defer ) {
+            if ( typeof resolve === 'function' ) {
                 if ( options.imageOnload ) options.imageOnload.call( image );
-                defer.resolve( image );
+                resolve( image );
             } else if ( options.imageOnload )
                 options.imageOnload.call( image );
 
@@ -199,11 +198,9 @@ Input.prototype = {
         if ( options.imageLoadingUsePromise !== true ) {
             return this.fetchImage( image, url, options );
         }
-
-        var defer = P.defer();
-        this.fetchImage( image, url, options, defer );
-
-        return defer.promise;
+        return new P( function ( resolve, reject ) {
+            this.fetchImage( image, url, options, resolve, reject );
+        }.bind( this ) );
     },
 
 
@@ -225,107 +222,104 @@ Input.prototype = {
 
         url = this.computeURL( url );
 
-        var defer = P.defer();
+        return new P( function ( resolve, reject ) {
+            // copy because we are going to modify it to have relative prefix to load assets
+            options = MACROUTILS.objectMix( {}, options );
 
-        // copy because we are going to modify it to have relative prefix to load assets
-        options = MACROUTILS.objectMix( {}, options );
-
-        // automatic prefix if non specfied
-        if ( !!!options.prefixURL ) {
-            var prefix = this.getPrefixURL();
-            var index = url.lastIndexOf( '/' );
-            if ( index !== -1 ) {
-                prefix = url.substring( 0, index + 1 );
-            }
-            options.prefixURL = prefix;
-        }
-
-        var self = this;
-
-        var ReaderParser = require( 'osgDB/readerParser' );
-
-        var readSceneGraph = function ( data ) {
-
-            ReaderParser.parseSceneGraph( data, options ).then( function ( child ) {
-                defer.resolve( child );
-                Notify.log( 'loaded ' + url );
-            } ).catch( defer.reject.bind( defer ) );
-        };
-
-        var ungzipFile = function ( arrayBuffer ) {
-
-            function pad( n ) {
-                return n.length < 2 ? '0' + n : n;
-            }
-
-            function uintToString( uintArray ) {
-                var str = '';
-                for ( var i = 0, len = uintArray.length; i < len; ++i ) {
-                    str += ( '%' + pad( uintArray[ i ].toString( 16 ) ) );
+            // automatic prefix if non specfied
+            if ( !!!options.prefixURL ) {
+                var prefix = this.getPrefixURL();
+                var index = url.lastIndexOf( '/' );
+                if ( index !== -1 ) {
+                    prefix = url.substring( 0, index + 1 );
                 }
-                str = decodeURIComponent( str );
+                options.prefixURL = prefix;
+            }
+
+            var self = this;
+
+            var ReaderParser = require( 'osgDB/readerParser' );
+
+            var readSceneGraph = function ( data ) {
+
+                ReaderParser.parseSceneGraph( data, options ).then( function ( child ) {
+                    resolve( child );
+                    Notify.log( 'loaded ' + url );
+                } ).catch( reject );
+            };
+
+            var ungzipFile = function ( arrayBuffer ) {
+
+                function pad( n ) {
+                    return n.length < 2 ? '0' + n : n;
+                }
+
+                function uintToString( uintArray ) {
+                    var str = '';
+                    for ( var i = 0, len = uintArray.length; i < len; ++i ) {
+                        str += ( '%' + pad( uintArray[ i ].toString( 16 ) ) );
+                    }
+                    str = decodeURIComponent( str );
+                    return str;
+                }
+
+
+                var unpacked = arrayBuffer;
+                if ( zlib.isGunzipBuffer( arrayBuffer ) ) {
+                    unpacked = zlib.gunzip( arrayBuffer );
+                }
+
+                var typedArray = new Uint8Array( unpacked );
+                var str = uintToString( typedArray );
                 return str;
-            }
+            };
 
 
-            var unpacked = arrayBuffer;
-            if ( zlib.isGunzipBuffer( arrayBuffer ) ) {
-                unpacked = zlib.gunzip( arrayBuffer );
-            }
+            // try to get the file as responseText to parse JSON
+            var fileTextPromise = self.requestFile( url );
+            fileTextPromise.then( function ( str ) {
 
-            var typedArray = new Uint8Array( unpacked );
-            var str = uintToString( typedArray );
-            return str;
-        };
+                var data;
+                try {
 
+                    data = JSON.parse( str );
 
-        // try to get the file as responseText to parse JSON
-        var fileTextPromise = self.requestFile( url );
-        fileTextPromise.then( function ( str ) {
+                } catch ( error ) { // can't parse try with ungzip code path
 
-            var data;
-            try {
+                    Notify.error( 'cant parse url ' + url + ' try to gunzip' );
 
-                data = JSON.parse( str );
+                }
 
-            } catch ( error ) { // can't parse try with ungzip code path
-
-                Notify.error( 'cant parse url ' + url + ' try to gunzip' );
-
-            }
-
-            // we have the json, read it
-            if ( data )
-                return readSceneGraph( data );
+                // we have the json, read it
+                if ( data )
+                    return readSceneGraph( data );
 
 
-            // no data try with gunzip
-            var fileGzipPromise = self.requestFile( url, {
-                responseType: 'arraybuffer'
-            } );
-            fileGzipPromise.then( function ( file ) {
+                // no data try with gunzip
+                var fileGzipPromise = self.requestFile( url, {
+                    responseType: 'arraybuffer'
+                } );
+                fileGzipPromise.then( function ( file ) {
 
-                var str = ungzipFile( file );
-                data = JSON.parse( str );
-                readSceneGraph( data );
+                    var str = ungzipFile( file );
+                    data = JSON.parse( str );
+                    readSceneGraph( data );
+
+                } ).catch( function ( status ) {
+
+                    Notify.error( 'cant read file ' + url + ' status ' + status );
+                    reject();
+
+                } );
+
+                return true;
 
             } ).catch( function ( status ) {
+                Notify.error( 'cant get file ' + url + ' status ' + status );
+                reject();
+            } );
 
-                Notify.error( 'cant read file ' + url + ' status ' + status );
-                defer.reject();
-
-            } ).done();
-
-            return true;
-
-        } ).catch( function ( status ) {
-
-            Notify.error( 'cant get file ' + url + ' status ' + status );
-            defer.reject();
-
-        } ).done();
-
-        return defer.promise;
+        }.bind( this ) );
     },
 
     _unzipTypedArray: function ( binary ) {
@@ -364,19 +358,20 @@ Input.prototype = {
         if ( this._identifierMap[ url ] !== undefined ) {
             return this._identifierMap[ url ];
         }
-        var defer = P.defer();
+        var promise = new P( function ( resolve ) {
 
-        var filePromise = this.requestFile( url, {
-            responseType: 'arraybuffer',
-            progress: this._defaultOptions.progressXHRCallback
-        } );
+            var filePromise = this.requestFile( url, {
+                responseType: 'arraybuffer',
+                progress: this._defaultOptions.progressXHRCallback
+            } );
 
-        this._identifierMap[ url ] = defer.promise;
-        filePromise.then( function ( file ) {
-            defer.resolve( this._unzipTypedArray( file ) );
+            this._identifierMap[ url ] = promise;
+            filePromise.then( function ( file ) {
+                resolve( this._unzipTypedArray( file ) );
+            }.bind( this ) );
+
         }.bind( this ) );
-
-        return defer.promise;
+        return promise;
     },
 
     initializeBufferArray: function ( vb, type, buf, options ) {
@@ -386,56 +381,58 @@ Input.prototype = {
             return options.initializeBufferArray.call( this, vb, type, buf );
 
         var url = vb.File;
-        var defer = P.defer();
-        this.readBinaryArrayURL( url ).then( function ( array ) {
+        return new P( function ( resolve ) {
+            this.readBinaryArrayURL( url ).then( function ( array ) {
 
-            var typedArray;
-            // manage endianness
-            var bigEndian;
-            ( function () {
-                var a = new Uint8Array( [ 0x12, 0x34 ] );
-                var b = new Uint16Array( a.buffer );
-                bigEndian = ( ( b[ 0 ] ).toString( 16 ) === '1234' );
-            } )();
+                var typedArray;
+                // manage endianness
+                var bigEndian;
+                ( function () {
+                    var a = new Uint8Array( [ 0x12, 0x34 ] );
+                    var b = new Uint16Array( a.buffer );
+                    bigEndian = ( ( b[ 0 ] ).toString( 16 ) === '1234' );
+                } )();
 
-            var offset = 0;
-            if ( vb.Offset !== undefined ) {
-                offset = vb.Offset;
-            }
-
-            var bytesPerElement = MACROUTILS[ type ].BYTES_PER_ELEMENT;
-            var nbItems = vb.Size;
-            var nbCoords = buf.getItemSize();
-            var totalSizeInBytes = nbItems * bytesPerElement * nbCoords;
-
-            if ( bigEndian ) {
-                Notify.log( 'big endian detected' );
-                var TypedArray = MACROUTILS[ type ];
-                var tmpArray = new TypedArray( nbItems * nbCoords );
-                var data = new DataView( array, offset, totalSizeInBytes );
-                var i = 0,
-                    l = tmpArray.length;
-                if ( type === 'Uint16Array' ) {
-                    for ( ; i < l; i++ ) {
-                        tmpArray[ i ] = data.getUint16( i * bytesPerElement, true );
-                    }
-                } else if ( type === 'Float32Array' ) {
-                    for ( ; i < l; i++ ) {
-                        tmpArray[ i ] = data.getFloat32( i * bytesPerElement, true );
-                    }
+                var offset = 0;
+                if ( vb.Offset !== undefined ) {
+                    offset = vb.Offset;
                 }
-                typedArray = tmpArray;
-                data = null;
-            } else {
-                typedArray = new MACROUTILS[ type ]( array, offset, nbCoords * nbItems );
-            }
 
-            buf.setElements( typedArray );
-            defer.resolve( buf );
-        } ).catch( function () {
-            Notify.warn( 'Can\'t read binary array URL' );
-        } );
-        return defer.promise;
+                var bytesPerElement = MACROUTILS[ type ].BYTES_PER_ELEMENT;
+                var nbItems = vb.Size;
+                var nbCoords = buf.getItemSize();
+                var totalSizeInBytes = nbItems * bytesPerElement * nbCoords;
+
+                if ( bigEndian ) {
+                    Notify.log( 'big endian detected' );
+                    var TypedArray = MACROUTILS[ type ];
+                    var tmpArray = new TypedArray( nbItems * nbCoords );
+                    var data = new DataView( array, offset, totalSizeInBytes );
+                    var i = 0,
+                        l = tmpArray.length;
+                    if ( type === 'Uint16Array' ) {
+                        for ( ; i < l; i++ ) {
+                            tmpArray[ i ] = data.getUint16( i * bytesPerElement, true );
+                        }
+                    } else if ( type === 'Float32Array' ) {
+                        for ( ; i < l; i++ ) {
+                            tmpArray[ i ] = data.getFloat32( i * bytesPerElement, true );
+                        }
+                    }
+                    typedArray = tmpArray;
+                    data = null;
+                } else {
+                    typedArray = new MACROUTILS[ type ]( array, offset, nbCoords * nbItems );
+                }
+
+                buf.setElements( typedArray );
+                resolve( buf );
+            } ).catch( function ( err ) {
+                Notify.warn( err.message );
+                Notify.warn( err );
+                Notify.warn( 'Can\'t read binary array URL' );
+            } );
+        }.bind( this ) );
     },
 
     readBufferArray: function ( options ) {

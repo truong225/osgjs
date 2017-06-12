@@ -787,26 +787,26 @@ ReaderWriterGLTF.prototype = {
     } ),
 
     readNodeURL: function ( url, options ) {
-        var defer = P.defer();
-        var self = this;
+        return new P( function ( resolve ) {
+            var self = this;
 
-        this.init();
-        if ( options && options.filesMap !== undefined && options.filesMap.size > 0 ) {
-            // it comes from the ZIP plugin or from drag'n drop
-            // So we already have all the files.
-            this._filesMap = options.filesMap;
-            var glTFFile = this._filesMap.get( url );
-            return this.readJSON( glTFFile, url );
-        }
+            this.init();
+            if ( options && options.filesMap !== undefined && options.filesMap.size > 0 ) {
+                // it comes from the ZIP plugin or from drag'n drop
+                // So we already have all the files.
+                this._filesMap = options.filesMap;
+                var glTFFile = this._filesMap.get( url );
+                return this.readJSON( glTFFile, url );
+            }
 
-        var index = url.lastIndexOf( '/' );
-        this._localPath = ( index === -1 ) ? '' : url.substr( 0, index + 1 );
-        // Else it is a usual XHR request
-        var filePromise = requestFile( url );
-        filePromise.then( function ( glTFFile ) {
-            defer.resolve( self.readJSON( glTFFile ) );
+            var index = url.lastIndexOf( '/' );
+            this._localPath = ( index === -1 ) ? '' : url.substr( 0, index + 1 );
+            // Else it is a usual XHR request
+            var filePromise = requestFile( url );
+            filePromise.then( function ( glTFFile ) {
+                resolve( self.readJSON( glTFFile ) );
+            } );
         } );
-        return defer.promise;
     },
 
     readJSON: P.method( function ( glTFFile, url ) {
