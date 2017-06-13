@@ -287,10 +287,12 @@
 
                 this._model = new osg.MatrixTransform();
                 osg.mat4.fromRotation( this._model.getMatrix(), -Math.PI, [ 0, 0, 1 ] );
+                osg.time('osgjs.metrics:readNodeURL');
                 var request = osgDB.readNodeURL( '../media/models/material-test/file.osgjs' );
 
                 // copy tex coord 0 to tex coord1 for multi texture
                 request.then( function ( model ) {
+                    osg.timeEnd('osgjs.metrics:readNodeURL');
                     var copyTexCoord = new VisitorCopyTexCoord();
                     model.accept( copyTexCoord );
                     this._model.addChild( model );
