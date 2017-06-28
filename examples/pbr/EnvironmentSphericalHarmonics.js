@@ -21,7 +21,7 @@ window.EnvironmentSphericalHarmonics = ( function () {
         this._file = file;
     };
 
-    EnvironmentSphericalHarmonics.prototype = {
+    osg.createPrototypeObject( EnvironmentSphericalHarmonics, {
 
         createShaderSpherical: function () {
 
@@ -100,7 +100,7 @@ window.EnvironmentSphericalHarmonics = ( function () {
             }.bind( this ) );
             return p;
         }
-    };
+    } );
 
     return EnvironmentSphericalHarmonics;
 } )();

@@ -17,7 +17,7 @@ var BaseOperator = function () {
     Node.call( this );
 };
 
-BaseOperator.prototype = Node.prototype;
+MACROUTILS.createPrototypeObject( BaseOperator, Node.prototype );
 
 
 // Add support this syntax:

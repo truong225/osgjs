@@ -79,7 +79,7 @@
 
     };
 
-    Example.prototype = osg.objectInherit( ExampleOSGJS.prototype, {
+    osg.createPrototypeObject( Example, osg.objectInherit( ExampleOSGJS.prototype, {
 
 
         initHammer: function () {
@@ -382,7 +382,7 @@
         }
 
 
-    } );
+    } ) );
 
     window.addEventListener( 'load', function () {
 

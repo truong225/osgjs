@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 
 var DeviceOrientation = function ( viewer ) {
     this._viewer = viewer;
@@ -10,7 +11,7 @@ var DeviceOrientation = function ( viewer ) {
     this._screenOrientation = window.orientation || 90;
 };
 
-DeviceOrientation.prototype = {
+MACROUTILS.createPrototypeObject( DeviceOrientation, {
 
     setEnable: function ( bool ) {
         this._enable = bool;
@@ -70,6 +71,6 @@ DeviceOrientation.prototype = {
         }
     }
 
-};
+} );
 
 module.exports = DeviceOrientation;

@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var BufferArray = require( 'osg/BufferArray' );
 var Camera = require( 'osg/Camera' );
 var FrameStamp = require( 'osg/FrameStamp' );
@@ -54,7 +55,7 @@ View.LightingMode = {
     SKY_LIGHT: 2
 };
 
-View.prototype = {
+MACROUTILS.createPrototypeObject( View, {
     requestRedraw: function () {
         this._requestRedraw = true;
     },
@@ -335,6 +336,6 @@ View.prototype = {
         FrameBufferObject.flushAllDeletedGLFrameBuffers( gl );
         FrameBufferObject.flushAllDeletedGLRenderBuffers( gl );
     }
-};
+} );
 
 module.exports = View;

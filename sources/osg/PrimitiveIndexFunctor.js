@@ -1,5 +1,5 @@
 'use strict';
-
+var MACROUTILS = require( 'osg/Utils' );
 var primitiveSet = require( 'osg/primitiveSet' );
 var DrawElements = require( 'osg/DrawElements' );
 var DrawArrays = require( 'osg/DrawArrays' );
@@ -124,7 +124,7 @@ functorDrawArrays[ primitiveSet.LINE_LOOP ] = function ( first, count, cb ) {
 
 
 
-PrimitiveIndexFunctor.prototype = {
+MACROUTILS.createPrototypeObject( PrimitiveIndexFunctor, {
 
     apply: function () {
         var geom = this._geom;
@@ -157,6 +157,6 @@ PrimitiveIndexFunctor.prototype = {
             }
         }
     }
-};
+} );
 
 module.exports = PrimitiveIndexFunctor;

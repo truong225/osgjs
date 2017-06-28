@@ -11,7 +11,7 @@
         this._viewer2 = undefined;
     };
 
-    Example.prototype = {
+    osg.createPrototypeObject( Example, {
 
         createScene1: function () {
             var node = new osg.MatrixTransform();
@@ -56,7 +56,7 @@
             this._viewer2.getManipulator().computeHomePosition();
             this._viewer2.run();
         }
-    };
+    } );
 
     window.addEventListener( 'load', function () {
         var example = new Example();

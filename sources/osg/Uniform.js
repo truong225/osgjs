@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var notify = require( 'osg/notify' );
 
 /**
@@ -23,7 +24,7 @@ Uniform.isUniform = function ( obj ) {
 };
 
 /** @lends Uniform.prototype */
-Uniform.prototype = {
+MACROUTILS.createPrototypeObject( Uniform, {
 
     getName: function () {
         return this._name;
@@ -111,7 +112,8 @@ Uniform.prototype = {
         this._data[ 14 ] = f[ 14 ];
         this._data[ 15 ] = f[ 15 ];
     }
-};
+} );
+
 Uniform.prototype.setVec2 = Uniform.prototype.setFloat2;
 Uniform.prototype.setVec3 = Uniform.prototype.setFloat3;
 Uniform.prototype.setVec4 = Uniform.prototype.setFloat4;

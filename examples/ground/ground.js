@@ -78,7 +78,7 @@
         this.addChild( quad );
     };
 
-    window.Ground.prototype = osg.objectLibraryClass( osg.objectInherit( osg.MatrixTransform.prototype, {
+    osg.createPrototypeNode( window.Ground, osg.objectInherit( osg.MatrixTransform.prototype, {
 
         // The min height of a bsphere will near always be lower than
         // that of the bounding box, so try to compensate it

@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var ShaderGenerator = require( 'osgShader/ShaderGenerator' );
 var ShadowCastShaderGenerator = require( 'osgShadow/ShadowCastShaderGenerator' );
 var DisplayNormalVisitor = require( 'osgUtil/DisplayNormalVisitor' );
@@ -18,7 +19,7 @@ var ShaderGeneratorProxy = function () {
     return this;
 };
 
-ShaderGeneratorProxy.prototype = {
+MACROUTILS.createPrototypeObject( ShaderGeneratorProxy, {
 
     getShaderGenerator: function ( name ) {
 
@@ -34,6 +35,6 @@ ShaderGeneratorProxy.prototype = {
 
     }
 
-};
+} );
 
 module.exports = ShaderGeneratorProxy;

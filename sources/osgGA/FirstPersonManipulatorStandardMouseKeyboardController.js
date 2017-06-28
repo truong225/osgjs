@@ -1,11 +1,12 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 
 var FirstPersonManipulatorStandardMouseKeyboardController = function ( manipulator ) {
     this._manipulator = manipulator;
     this.init();
 };
 
-FirstPersonManipulatorStandardMouseKeyboardController.prototype = {
+MACROUTILS.createPrototypeObject( FirstPersonManipulatorStandardMouseKeyboardController, {
     init: function () {
         this.releaseButton();
         this._delay = 0.15;
@@ -101,6 +102,6 @@ FirstPersonManipulatorStandardMouseKeyboardController.prototype = {
         return undefined;
     }
 
-};
+} );
 
 module.exports = FirstPersonManipulatorStandardMouseKeyboardController;

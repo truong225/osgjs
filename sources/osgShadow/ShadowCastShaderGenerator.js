@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var ShaderGenerator = require( 'osgShader/ShaderGenerator' );
 var ShadowCompiler = require( 'osgShadow/ShadowCastCompiler' );
 
@@ -9,6 +10,6 @@ var ShaderGeneratorShadowCast = function () {
 
 };
 
-ShaderGeneratorShadowCast.prototype = ShaderGenerator.prototype;
+MACROUTILS.createPrototypeObject( ShaderGeneratorShadowCast, ShaderGenerator.prototype );
 
 module.exports = ShaderGeneratorShadowCast;

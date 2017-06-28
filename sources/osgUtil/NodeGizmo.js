@@ -23,11 +23,11 @@ var getCanvasCoord = function ( vec, e ) {
 };
 
 var HideCullCallback = function () {};
-HideCullCallback.prototype = {
+MACROUTILS.createPrototypeObject( HideCullCallback, {
     cull: function () {
         return false;
     }
-};
+} );
 
 var blendAttribute = new BlendFunc( BlendFunc.SRC_ALPHA, BlendFunc.ONE_MINUS_SRC_ALPHA );
 
@@ -209,9 +209,9 @@ MACROUTILS.createPrototypeNode( NodeGizmo, MACROUTILS.objectInherit( MatrixTrans
         this.getOrCreateStateSet().setAttributeAndModes( new CullFace( CullFace.DISABLE ) );
 
         var UpdateCallback = function () {};
-        UpdateCallback.prototype = {
+        MACROUTILS.createPrototypeObject( UpdateCallback, {
             update: this.updateGizmo.bind( this )
-        };
+        } );
         this.addUpdateCallback( new UpdateCallback() );
         this.addChild( this.initNodeTranslate() );
         this.addChild( this.initNodeTranslatePlane() );

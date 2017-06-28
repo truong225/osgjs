@@ -16,7 +16,7 @@
             this.createRandomCamera( nb, center, range );
         }
     };
-    CameraSwitcher.prototype = {
+    osg.createPrototypeObject( CameraSwitcher, {
         createRandomCamera: function ( nb, center, range ) {
             var camera = [];
             for ( var x = 0; x < nb; x++ ) {
@@ -81,7 +81,7 @@
             return this._currentTarget;
         }
 
-    };
+    } );
 
 
     var main = function () {

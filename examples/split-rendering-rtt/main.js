@@ -64,9 +64,7 @@
         this._binArraySorted = [];
     };
 
-    RenderStageSplitter.prototype = osg.objectInherit( osg.RenderStage.prototype, {
-
-        constructor: RenderStageSplitter,
+    osg.createPrototypeObject( RenderStageSplitter, osg.objectInherit( osg.RenderStage.prototype, {
 
         isMainCamera: function () {
 
@@ -320,7 +318,7 @@
             // previous = this.drawImplementationRenderBin( state, previous );
             return previous;
         }
-    } );
+    } ) );
 
 
     var Example = function () {
@@ -329,7 +327,7 @@
 
     };
 
-    Example.prototype = osg.objectInherit( ExampleOSGJS.prototype, {
+    osg.createPrototypeObject( Example, osg.objectInherit( ExampleOSGJS.prototype, {
 
         createCameraRTT: function ( textureOpaque, textureTranparent ) {
             var camera = new osg.Camera();
@@ -437,7 +435,7 @@
             this._viewer.getCamera().getRenderer().setRenderStage( new RenderStageSplitter() );
         }
 
-    } );
+    } ) );
 
     window.addEventListener( 'load', function () {
         var example = new Example();

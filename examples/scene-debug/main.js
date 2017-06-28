@@ -9,7 +9,7 @@
 
     var Example = function () {};
 
-    Example.prototype = {
+    osg.createPrototypeObject( Example, {
 
         // This function will create a basic scene with some cubes
         createScene: function () {
@@ -93,7 +93,7 @@
             viewer.run();
         }
 
-    };
+    } );
 
     window.addEventListener( 'load', function () {
         var example = new Example();

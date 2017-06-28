@@ -104,7 +104,7 @@
         this._projectionInfo = new Array( 4 );
     };
 
-    Example.prototype = osg.objectInherit( ExampleOSGJS.prototype, {
+    osg.createPrototypeObject( Example, osg.objectInherit( ExampleOSGJS.prototype, {
 
         createScene: function () {
 
@@ -688,9 +688,9 @@
             controller.onChange( this.updateScene.bind( this ) );
 
             this.updateScene();
-        },
+        }
 
-    } );
+    } ) );
 
     var dragOverEvent = function ( evt ) {
 

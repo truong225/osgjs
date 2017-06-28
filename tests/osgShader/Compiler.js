@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var assert = require( 'chai' ).assert;
 var Light = require( 'osg/Light' );
 var Material = require( 'osg/Material' );

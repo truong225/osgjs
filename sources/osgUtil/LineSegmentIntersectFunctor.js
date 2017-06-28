@@ -1,5 +1,5 @@
 'use strict';
-
+var MACROUTILS = require( 'osg/Utils' );
 var vec3 = require( 'osg/glMatrix' ).vec3;
 var mat4 = require( 'osg/glMatrix' ).mat4;
 var TriangleIndexFunctor = require( 'osg/TriangleIndexFunctor' );
@@ -44,8 +44,7 @@ var LineSegmentIntersectFunctor = function () {
     this._hit = false;
 };
 
-LineSegmentIntersectFunctor.prototype = {
-
+MACROUTILS.createPrototypeObject( LineSegmentIntersectFunctor, {
 
     reset: function () {
         this._hit = false;
@@ -320,7 +319,7 @@ LineSegmentIntersectFunctor.prototype = {
             tif.apply();
 
         };
-    } )(),
-};
+    } )()
+} );
 
 module.exports = LineSegmentIntersectFunctor;

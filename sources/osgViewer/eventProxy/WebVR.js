@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var Notify = require( 'osg/notify' );
 var quat = require( 'osg/glMatrix' ).quat;
 var vec3 = require( 'osg/glMatrix' ).vec3;
@@ -21,7 +22,7 @@ var WebVR = function ( viewer ) {
     this._worldScale = 1.0;
 };
 
-WebVR.prototype = {
+MACROUTILS.createPrototypeObject( WebVR, {
 
     setWorldScale: function ( val ) {
         this._worldScale = val;
@@ -131,5 +132,5 @@ WebVR.prototype = {
     getHmd: function () {
         return this._hmd;
     }
-};
+} );
 module.exports = WebVR;

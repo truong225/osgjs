@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var BoundingSphere = require( 'osg/BoundingSphere' );
 var mat4 = require( 'osg/glMatrix' ).mat4;
 
@@ -16,7 +17,7 @@ var Manipulator = function ( boundStrategy ) {
     this._computeBoundNodeMaskOverride = ~0x0;
 };
 
-Manipulator.prototype = {
+MACROUTILS.createPrototypeObject( Manipulator, {
     setCamera: function ( c ) {
         this._camera = c;
     },
@@ -94,7 +95,7 @@ Manipulator.prototype = {
     getControllerList: function () {
         return this._controllerList;
     }
-};
+} );
 
 // flags
 Manipulator.COMPUTE_HOME_USING_SPHERE = 1 << 0;

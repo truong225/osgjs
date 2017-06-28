@@ -54,7 +54,7 @@
         shaderNode.BaseOperator.apply( this, arguments );
     };
 
-    NegatifNode.prototype = osg.objectInherit( shaderNode.BaseOperator.prototype, {
+    osg.createPrototypeObject( NegatifNode, osg.objectInherit( shaderNode.BaseOperator.prototype, {
         type: 'Negatif',
         validInputs: [ 'enable', 'color' ],
         validOutputs: [ 'color' ],
@@ -73,7 +73,7 @@
                 this._outputs.color
             ] );
         }
-    } );
+    } ) );
 
     factory.registerNode( 'Negatif', NegatifNode );
 

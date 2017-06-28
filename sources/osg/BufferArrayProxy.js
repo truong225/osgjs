@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var BufferArray = require( 'osg/BufferArray' );
 
 
@@ -39,5 +40,6 @@ for ( var methodName in BufferArray.prototype ) {
     prototype[ methodName ] = makeFunc( BufferArray.prototype[ methodName ] );
 }
 
-BufferArrayProxy.prototype = prototype;
+MACROUTILS.createPrototypeObject( BufferArrayProxy, prototype );
+
 module.exports = BufferArrayProxy;

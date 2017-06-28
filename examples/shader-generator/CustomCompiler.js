@@ -17,7 +17,7 @@
     config.attribute.push( 'Negatif' );
     osgShader.Compiler.setStateAttributeConfig( CustomCompiler, config );
 
-    CustomCompiler.prototype = osg.objectInherit( osgShader.Compiler.prototype, {
+    osg.createPrototypeObject( CustomCompiler, osg.objectInherit( osgShader.Compiler.prototype, {
 
         createLighting: function () {
             // we simply hook the createLighting function and apply our ramp and negatif attributes
@@ -57,7 +57,7 @@
             return lightOutput;
         }
 
-    } );
+    } ) );
 
     window.CustomCompiler = CustomCompiler;
 

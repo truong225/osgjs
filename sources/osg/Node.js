@@ -205,11 +205,11 @@ MACROUTILS.createPrototypeNode( Node, MACROUTILS.objectInherit( Object.prototype
       </p>
       @example
       var DummyCullCallback = function() {};
-      DummyCullCallback.prototype = {
+      osg.createPrototypeObject( DummyCullCallback, {
           cull: function(node, nodeVisitor) {
               return true;
           }
-      };
+      } );
 
       @param Oject callback
    */
@@ -399,7 +399,7 @@ MACROUTILS.createPrototypeNode( Node, MACROUTILS.objectInherit( Object.prototype
             this.halt = undefined;
             NodeVisitor.call( this, NodeVisitor.TRAVERSE_PARENTS );
         };
-        CollectParentPaths.prototype = MACROUTILS.objectInherit( NodeVisitor.prototype, {
+        MACROUTILS.createPrototypeObject( CollectParentPaths, MACROUTILS.objectInherit( NodeVisitor.prototype, {
             reset: function () {
                 this.nodePath.length = 0;
                 this.nodePaths.length = 0;
@@ -412,7 +412,7 @@ MACROUTILS.createPrototypeNode( Node, MACROUTILS.objectInherit( Object.prototype
                     this.traverse( node );
                 }
             }
-        } );
+        } ) );
         var collected = new CollectParentPaths();
         collected.setNodeMaskOverride( ~0x0 ); // traverse everything
 

@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var Camera = require( 'osg/Camera' );
 var FrameBufferObject = require( 'osg/FrameBufferObject' );
 var mat4 = require( 'osg/glMatrix' ).mat4;
@@ -20,13 +21,13 @@ var UpdateRttCameraCallback = function ( rootView, offsetView ) {
     this._offsetView = offsetView;
 };
 
-UpdateRttCameraCallback.prototype = {
+MACROUTILS.createPrototypeObject( UpdateRttCameraCallback, {
     update: function ( node /*, nv */ ) {
         var nodeView = node.getViewMatrix();
         mat4.mul( nodeView, this._offsetView, this._rootView );
         return true;
     }
-};
+} );
 
 var createTexture = function ( size ) {
     var texture = new Texture();

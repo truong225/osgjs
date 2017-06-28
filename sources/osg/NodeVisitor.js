@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 
 var NodeVisitor = function ( traversalMode ) {
     /*jshint bitwise: false */
@@ -78,7 +79,7 @@ NodeVisitor._popFromNodePath = [
 ];
 
 
-NodeVisitor.prototype = {
+MACROUTILS.createPrototypeObject( NodeVisitor, {
 
     reset: function () {
         // to be used when you want to re-use a nv
@@ -139,6 +140,6 @@ NodeVisitor.prototype = {
     getDatabaseRequestHandler: function () {
         return this._databaseRequestHandler;
     }
-};
+} );
 
 module.exports = NodeVisitor;

@@ -16,7 +16,7 @@
      };
 
 
-     Example.prototype = osg.objectInherit( ExampleOSGJS.prototype, {
+     osg.createPrototypeObject( Example, osg.objectInherit( ExampleOSGJS.prototype, {
 
 
          createCameraSharedRTT: function ( texture, clearColor, index, num ) {
@@ -133,7 +133,7 @@
          }
 
 
-     } );
+     } ) );
 
 
      window.addEventListener( 'load', function () {

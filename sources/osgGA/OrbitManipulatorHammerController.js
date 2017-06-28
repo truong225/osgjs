@@ -1,5 +1,5 @@
 'use strict';
-
+var MACROUTILS = require( 'osg/Utils' );
 var Notify = require( 'osg/notify' );
 var osgMath = require( 'osg/math' );
 
@@ -8,7 +8,7 @@ var OrbitManipulatorHammerController = function ( manipulator ) {
     this.init();
 };
 
-OrbitManipulatorHammerController.prototype = {
+MACROUTILS.createPrototypeObject( OrbitManipulatorHammerController, {
     init: function () {
         this._panFactorX = 1.0;
         this._panFactorY = -this._panFactorX;
@@ -166,5 +166,6 @@ OrbitManipulatorHammerController.prototype = {
     setManipulator: function ( manipulator ) {
         this._manipulator = manipulator;
     }
-};
+} );
+
 module.exports = OrbitManipulatorHammerController;

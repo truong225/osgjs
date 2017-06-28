@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var DisplayGraphNode = require( 'osgUtil/DisplayGraphNode' );
 var RenderBin = require( 'osg/RenderBin' );
 
@@ -17,7 +18,8 @@ var DisplayGraphRenderer = function ( selectables ) {
     this._uniqueEdges = new window.Set();
 };
 
-DisplayGraphRenderer.prototype = {
+MACROUTILS.createPrototypeObject( DisplayGraphRenderer, {
+
     getColorFromClassName: DisplayGraphNode.prototype.getColorFromClassName,
 
     createGraph: function ( renderBin ) {
@@ -226,6 +228,6 @@ DisplayGraphRenderer.prototype = {
             g.addEdge( null, this._linkList[ j ].parentNode, this._linkList[ j ].childrenNode );
         }
     }
-};
+} );
 
 module.exports = DisplayGraphRenderer;

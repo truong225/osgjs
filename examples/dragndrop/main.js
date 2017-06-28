@@ -10,7 +10,7 @@
     };
 
 
-    Example.prototype = osg.objectInherit( ExampleOSGJS.prototype, {
+    osg.createPrototypeObject( Example, osg.objectInherit( ExampleOSGJS.prototype, {
 
         run: function () {
             ExampleOSGJS.prototype.run.call( this );
@@ -34,8 +34,8 @@
                 self.getRootNode().addChild( node );
                 self._viewer.getManipulator().computeHomePosition();
             } );
-        },
-    } );
+        }
+    } ) );
 
     var dragOverEvent = function ( evt ) {
         evt.stopPropagation();

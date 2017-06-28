@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var Notify = require( 'osg/notify' );
 
 
@@ -9,7 +10,7 @@ var GamePad = function ( viewer ) {
     this._gamepadIndex = -1;
 };
 
-GamePad.prototype = {
+MACROUTILS.createPrototypeObject( GamePad, {
 
     setEnable: function ( bool ) {
         this._enable = bool;
@@ -89,5 +90,5 @@ GamePad.prototype = {
             manipulatorAdapter.update( gamepad );
         }
     }
-};
+} );
 module.exports = GamePad;

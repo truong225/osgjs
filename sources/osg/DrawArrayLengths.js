@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 
 /**
  * DrawArrayLengths manage rendering primitives
@@ -11,7 +12,8 @@ var DrawArrayLengths = function ( mode, first, array ) {
 };
 
 /** @lends DrawArrayLengths.prototype */
-DrawArrayLengths.prototype = {
+MACROUTILS.createPrototypeObject( DrawArrayLengths, {
+
     draw: function ( state ) {
         var gl = state.getGraphicContext();
         var mode = this._mode;
@@ -46,6 +48,6 @@ DrawArrayLengths.prototype = {
     setFirst: function ( first ) {
         this._first = first;
     }
-};
+} );
 
 module.exports = DrawArrayLengths;

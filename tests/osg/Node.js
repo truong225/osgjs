@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var assert = require( 'chai' ).assert;
 var Node = require( 'osg/Node' );
 
@@ -42,11 +43,11 @@ module.exports = function () {
     test( 'Node.getNumChildrenRequiringUpdateTraversal', function () {
 
         var DummyUpdateCallback = function () {};
-        DummyUpdateCallback.prototype = {
+        MACROUTILS.createPrototypeObject( DummyUpdateCallback, {
             update: function () {
                 return true;
             }
-        };
+        } );
 
         var fakeCallback = new DummyUpdateCallback();
 

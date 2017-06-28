@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var osgPool = require( 'osgUtil/osgPool' );
 
 
@@ -11,7 +12,7 @@ var StateGraph = function () {
     this.parent = undefined;
 };
 
-StateGraph.prototype = {
+MACROUTILS.createPrototypeObject( StateGraph, {
 
     clean: function () {
 
@@ -66,7 +67,7 @@ StateGraph.prototype = {
         return sg;
     }
 
-};
+} );
 
 StateGraph.moveStateGraph = function ( state, sgCurrentArg, sgNewArg ) {
 

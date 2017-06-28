@@ -16,7 +16,7 @@ window.EnvironmentCubeMap = ( function () {
         else this._data = urlOrData;
     };
 
-    CubeMapEnv.prototype = {
+    osg.createPrototypeObject( CubeMapEnv, {
 
         createTexture: function ( image ) {
             var texture = new osg.Texture();
@@ -230,7 +230,7 @@ window.EnvironmentCubeMap = ( function () {
         }
 
 
-    };
+    } );
 
     return CubeMapEnv;
 } )();

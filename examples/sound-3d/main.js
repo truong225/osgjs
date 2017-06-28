@@ -34,7 +34,7 @@
     };
 
 
-    Example.prototype = osg.objectInherit( ExampleOSGJS.prototype, {
+    osg.createPrototypeObject( Example, osg.objectInherit( ExampleOSGJS.prototype, {
 
         initializeSoundCloud: function () {
             SC.initialize( {
@@ -148,7 +148,7 @@
 
         }
 
-    } );
+    } ) );
 
     window.addEventListener( 'load', function () {
 

@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var Notify = require( 'osg/notify' );
 var WebGLUtils = require( 'osgViewer/webgl-utils' );
 var Options = require( 'osg/Options' );
@@ -114,7 +115,7 @@ WebGLCaps.instance = function ( glParam ) {
     return WebGLCaps._instance;
 };
 
-WebGLCaps.prototype = {
+MACROUTILS.createPrototypeObject( WebGLCaps, {
 
     getContext: function () {
         return this._gl;
@@ -437,6 +438,6 @@ WebGLCaps.prototype = {
         }
 
     }
-};
+} );
 
 module.exports = WebGLCaps;

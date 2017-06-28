@@ -48,7 +48,7 @@
     };
 
 
-    Example.prototype = {
+    osg.createPrototypeObject( Example, {
 
         initDatGUI: function () {
 
@@ -204,7 +204,7 @@
 
             }.bind( this ) );
         }
-    };
+    } );
 
     window.addEventListener( 'load', function () {
         var example = new Example();

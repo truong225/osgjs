@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var primitiveSet = require( 'osg/primitiveSet' );
 
 
@@ -28,7 +29,7 @@ DrawElements.UNSIGNED_SHORT = 0x1403;
 DrawElements.UNSIGNED_INT = 0x1405;
 
 /** @lends DrawElements.prototype */
-DrawElements.prototype = {
+MACROUTILS.createPrototypeObject( DrawElements, {
     getMode: function () {
         return this.mode;
     },
@@ -75,6 +76,6 @@ DrawElements.prototype = {
     }
 
 
-};
+} );
 
 module.exports = DrawElements;

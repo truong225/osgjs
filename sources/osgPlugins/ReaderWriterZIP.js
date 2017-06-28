@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var P = require( 'bluebird' );
 var requestFile = require( 'osgDB/requestFile.js' );
 var Notify = require( 'osg/notify' );
@@ -14,7 +15,7 @@ var ReaderWriterZIP = function () {
 };
 
 
-ReaderWriterZIP.prototype = {
+MACROUTILS.createPrototypeObject( ReaderWriterZIP, {
 
     readNodeURL: function ( url, options ) {
         var defer = P.defer();
@@ -100,7 +101,7 @@ ReaderWriterZIP.prototype = {
 
     }
 
-};
+} );
 
 Registry.instance().addReaderWriter( 'zip', new ReaderWriterZIP() );
 

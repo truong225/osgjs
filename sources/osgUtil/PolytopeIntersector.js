@@ -1,5 +1,5 @@
 'use strict';
-//var PolytopePrimitiveIntersector = require( 'osgUtil/PolytopePrimitiveIntersector' );
+var MACROUTILS = require( 'osg/Utils' );
 var vec4 = require( 'osg/glMatrix' ).vec4;
 var vec3 = require( 'osg/glMatrix' ).vec3;
 var Polytope = require( 'osg/Polytope' );
@@ -46,7 +46,7 @@ var transformVec4PostMult = function ( out, p, m ) {
     out[ 3 ] = m[ 12 ] * x + m[ 13 ] * y + m[ 14 ] * z + m[ 15 ] * w;
 };
 
-PolytopeIntersector.prototype = {
+MACROUTILS.createPrototypeObject( PolytopeIntersector, {
 
     setPolytope: function ( polytope ) {
 
@@ -155,6 +155,6 @@ PolytopeIntersector.prototype = {
         // multiply the coefficients of the plane equation with a constant factor so that the equation a^2+b^2+c^2 = 1 holds.
         vec4.scale( this._iReferencePlane, this._iReferencePlane, 1.0 / vec3.len( this._iReferencePlane ) );
     }
-};
+} );
 
 module.exports = PolytopeIntersector;

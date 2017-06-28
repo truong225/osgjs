@@ -24,7 +24,7 @@
 
     };
 
-    Example.prototype = osg.objectInherit( ExampleOSGJS.prototype, {
+    osg.createPrototypeObject( Example, osg.objectInherit( ExampleOSGJS.prototype, {
 
         run: function () {
 
@@ -183,7 +183,7 @@
             this._canvas.addEventListener( 'touchend', this.unTouch.bind( this ), false );
         }
 
-    } );
+    } ) );
 
     window.addEventListener( 'load', function () {
         var example = new Example();

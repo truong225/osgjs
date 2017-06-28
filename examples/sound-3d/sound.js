@@ -6,7 +6,7 @@
        this._player.setAttribute( 'src', url );
    };
 
-   Sound.prototype = {
+osg.createPrototypeObject( Sound, {
 
        play: function () {
            if ( this._player ) this._player.play();
@@ -35,7 +35,7 @@
 
        } )()
 
-   };
+} );
 
 
    var SoundManager = function () {
@@ -43,7 +43,7 @@
        this._context = new AudioConstructor();
    };
 
-   SoundManager.prototype = {
+osg.createPrototypeObject( SoundManager, {
 
        create3DSound: function ( player, url ) {
            var panner = this._context.createPanner();
@@ -115,4 +115,4 @@
            };
        } )()
 
-   };
+} );

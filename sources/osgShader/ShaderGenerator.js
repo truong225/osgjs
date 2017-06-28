@@ -19,7 +19,7 @@ var ShaderGenerator = function () {
     this.setShaderCompiler( Compiler );
 };
 
-ShaderGenerator.prototype = {
+MACROUTILS.createPrototypeObject( ShaderGenerator, {
 
     // setShaderCompiler that will be used to createShader
     setShaderCompiler: function ( ShaderCompiler ) {
@@ -290,6 +290,6 @@ ShaderGenerator.prototype = {
             return program;
         };
     } )()
-};
+} );
 
 module.exports = ShaderGenerator;

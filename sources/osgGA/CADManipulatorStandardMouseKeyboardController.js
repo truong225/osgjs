@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var OrbitManipulator = require( 'osgGA/OrbitManipulator' );
 
 var CADManipulatorStandardMouseKeyboardController = function ( manipulator ) {
@@ -7,7 +8,7 @@ var CADManipulatorStandardMouseKeyboardController = function ( manipulator ) {
     this.init();
 };
 
-CADManipulatorStandardMouseKeyboardController.prototype = {
+MACROUTILS.createPrototypeObject( CADManipulatorStandardMouseKeyboardController, {
     init: function () {
         this.releaseButton();
         this._rotateKey = 65; // a
@@ -179,6 +180,6 @@ CADManipulatorStandardMouseKeyboardController.prototype = {
         this.setMode( undefined );
     },
 
-};
+} );
 
 module.exports = CADManipulatorStandardMouseKeyboardController;

@@ -53,7 +53,7 @@ if ( !Input.imageFallback ) {
     } )();
 }
 
-Input.prototype = {
+MACROUTILS.createPrototypeObject( Input, {
 
     clone: function () {
         var input = new Input();
@@ -651,6 +651,6 @@ Input.prototype = {
 
         return promise;
     }
-};
+} );
 
 module.exports = Input;

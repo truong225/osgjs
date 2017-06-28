@@ -11,7 +11,7 @@ var osgGA = window.osgGA;
 
 var SimpleUpdateCallback = function () {};
 
-SimpleUpdateCallback.prototype = {
+osg.createPrototypeObject( SimpleUpdateCallback, {
     // rotation angle
     angle: 0,
 
@@ -42,7 +42,7 @@ SimpleUpdateCallback.prototype = {
 
     }
 
-};
+} );
 
 
 function createScene() {

@@ -40,7 +40,7 @@
 
     };
 
-    Example.prototype = osg.objectInherit( ExampleOSGJS.prototype, {
+    osg.createPrototypeObject( Example, osg.objectInherit( ExampleOSGJS.prototype, {
 
         createScene: function () {
             var group = new osg.Node();
@@ -578,7 +578,7 @@
 
         }
 
-    } );
+    } ) );
 
 
 

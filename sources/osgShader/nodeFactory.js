@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var Notify = require( 'osg/notify' );
 var skinning = require( 'osgShader/node/skinning' );
 var data = require( 'osgShader/node/data' );
@@ -25,7 +26,7 @@ var Factory = function () {
     this.registerNodes( billboard );
 };
 
-Factory.prototype = {
+MACROUTILS.createPrototypeObject( Factory, {
 
     registerNodes: function ( obj ) {
         for ( var key in obj ) {
@@ -62,7 +63,7 @@ Factory.prototype = {
         return instance;
     }
 
-};
+} );
 
 var instance = new Factory();
 

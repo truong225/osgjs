@@ -48,7 +48,7 @@
         shaderNode.BaseOperator.apply( this, arguments );
     };
 
-    RampNode.prototype = osg.objectInherit( shaderNode.BaseOperator.prototype, {
+    osg.createPrototypeObject( RampNode, osg.objectInherit( shaderNode.BaseOperator.prototype, {
         type: 'Ramp',
         validInputs: [ 'color' ],
         validOutputs: [ 'color' ],
@@ -66,7 +66,7 @@
                 this._outputs.color
             ] );
         }
-    } );
+    } ) );
 
     factory.registerNode( 'Ramp', RampNode );
 } )();

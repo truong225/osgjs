@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var Camera = require( 'osg/Camera' );
 var FrameBufferObject = require( 'osg/FrameBufferObject' );
 var mat4 = require( 'osg/glMatrix' ).mat4;
@@ -29,7 +30,7 @@ var UpdateRecreateOnResize = function ( viewer, rttScene, hmdConfig, root, canva
     this._height = canvas.height;
 };
 
-UpdateRecreateOnResize.prototype = {
+MACROUTILS.createPrototypeObject( UpdateRecreateOnResize, {
     update: function () {
         var canvas = this._canvas;
         var width = canvas.width;
@@ -50,20 +51,20 @@ UpdateRecreateOnResize.prototype = {
         }
         return true;
     }
-};
+} );
 
 var UpdateOffsetCamera = function ( rootView, offsetView ) {
     this._rootView = rootView;
     this._offsetView = offsetView;
 };
 
-UpdateOffsetCamera.prototype = {
+MACROUTILS.createPrototypeObject( UpdateOffsetCamera, {
     update: function ( node ) {
         var nodeView = node.getViewMatrix();
         mat4.mul( nodeView, this._offsetView, this._rootView );
         return true;
     }
-};
+} );
 
 var setupWebVR = function ( worldFactor, HMD, webVRUniforms, webVRMatrices ) {
 

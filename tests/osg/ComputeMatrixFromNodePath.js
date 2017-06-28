@@ -21,12 +21,12 @@ module.exports = function () {
                 NodeVisitor.call( this, NodeVisitor.TRAVERSE_PARENTS );
                 this.node = undefined;
             };
-            GetRootItem.prototype = MACROUTILS.objectInherit( NodeVisitor.prototype, {
+            MACROUTILS.createPrototypeObject( GetRootItem, MACROUTILS.objectInherit( NodeVisitor.prototype, {
                 apply: function ( node ) {
                     this.node = node;
                     this.traverse( node );
                 }
-            } );
+            } ) );
 
             var root = new MatrixTransform();
             root.setName( 'root' );

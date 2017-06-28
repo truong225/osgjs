@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var mat4 = require( 'osg/glMatrix' ).mat4;
 var StateAttribute = require( 'osg/StateAttribute' );
 var SkinningAttribute = require( 'osgAnimation/SkinningAttribute' );
@@ -19,7 +20,7 @@ var RigTransformHardware = function () {
 };
 
 
-RigTransformHardware.prototype = {
+MACROUTILS.createPrototypeObject( RigTransformHardware, {
 
     // boneNameID contains a map: boneName: id
     // {
@@ -125,7 +126,7 @@ RigTransformHardware.prototype = {
 
         this.computeMatrixPalette( geom.getMatrixFromSkeletonToGeometry(), geom.getInvMatrixFromSkeletonToGeometry() );
     }
-};
+} );
 
 
 module.exports = RigTransformHardware;

@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var Notify = require( 'osg/notify' );
 
 var CADManipulatorHammerController = function ( manipulator ) {
@@ -7,7 +8,7 @@ var CADManipulatorHammerController = function ( manipulator ) {
     this.init();
 };
 
-CADManipulatorHammerController.prototype = {
+MACROUTILS.createPrototypeObject( CADManipulatorHammerController, {
     init: function () {
         this._panFactorX = 1.0;
         this._panFactorY = -this._panFactorX;
@@ -199,6 +200,6 @@ CADManipulatorHammerController.prototype = {
     setManipulator: function ( manipulator ) {
         this._manipulator = manipulator;
     }
-};
+} );
 
 module.exports = CADManipulatorHammerController;

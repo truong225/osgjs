@@ -25,7 +25,7 @@ var onLoad = function () {
 
     // we create a Callback
     var LightUpdateCallback = function () {};
-    LightUpdateCallback.prototype = {
+    osg.createPrototypeObject( LightUpdateCallback, {
         update: function ( node, nv ) {
             //every 5 seconds
             var currentTime = nv.getFrameStamp().getSimulationTime();
@@ -34,7 +34,8 @@ var onLoad = function () {
             node.getLight().setDiffuse( osg.vec4.fromValues( currentTime, 0.0, 0.0, 0.0 ) );
             node.traverse( nv );
         }
-    };
+    } );
+
     // Lights
     var lightSource = new osg.LightSource();
     var lightNew = new osg.Light();

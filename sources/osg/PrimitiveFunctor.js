@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var vec3 = require( 'osg/glMatrix' ).vec3;
 var primitiveSet = require( 'osg/primitiveSet' );
 var DrawElements = require( 'osg/DrawElements' );
@@ -349,7 +350,7 @@ functorDrawArrays[ primitiveSet.TRIANGLE_FAN ] = ( function () {
     };
 } )();
 
-PrimitiveFunctor.prototype = {
+MACROUTILS.createPrototypeObject( PrimitiveFunctor, {
     apply: function () {
         var geom = this._geom;
         var primitives = geom.getPrimitiveSetList();
@@ -382,6 +383,6 @@ PrimitiveFunctor.prototype = {
             }
         }
     }
-};
+} );
 
 module.exports = PrimitiveFunctor;

@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var Polytope = require( 'osg/Polytope' );
 
 var CullingSet = function () {
@@ -8,7 +9,7 @@ var CullingSet = function () {
 
 };
 
-CullingSet.prototype = {
+MACROUTILS.createPrototypeObject( CullingSet, {
 
     reset: function () {
         this._mask = CullingSet.DEFAULT_CULLING;
@@ -59,7 +60,7 @@ CullingSet.prototype = {
         }
         return false;
     }
-};
+} );
 
 CullingSet.NO_CULLING = 0x0;
 

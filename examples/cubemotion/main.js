@@ -10,7 +10,7 @@
     var TransitionUpdateCallback = function ( target ) {
         this._target = target;
     };
-    TransitionUpdateCallback.prototype = {
+    osg.createPrototypeObject( TransitionUpdateCallback, {
 
         update: function ( node, nv ) {
             var t = nv.getFrameStamp().getSimulationTime();
@@ -48,7 +48,7 @@
             osg.mat4.setTranslation( m, current );
             return true;
         }
-    };
+    } );
 
     var createTexturedBox = function ( centerx, centery, centerz,
         sizex, sizey, sizez,

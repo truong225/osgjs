@@ -14,7 +14,7 @@
         osg.NodeVisitor.call( this, osg.NodeVisitor.TRAVERSE_ALL_CHILDREN );
         this._cb = undefined;
     };
-    FindAnimationManagerVisitor.prototype = osg.objectInherit( osg.NodeVisitor.prototype, {
+    osg.createPrototypeObject( FindAnimationManagerVisitor, osg.objectInherit( osg.NodeVisitor.prototype, {
         getAnimationManager: function () {
             return this._cb;
         },
@@ -28,20 +28,20 @@
             }
             this.traverse( node );
         }
-    } );
+    } ) );
 
     var HideCullCallback = function () {};
-    HideCullCallback.prototype = {
+    osg.createPrototypeObject( HideCullCallback, {
         cull: function () {
             return false;
         }
-    };
+    } );
     var hideCullCallback = new HideCullCallback();
 
     var HideBBVisitor = function () {
         osg.NodeVisitor.call( this, osg.NodeVisitor.TRAVERSE_ALL_CHILDREN );
     };
-    HideBBVisitor.prototype = osg.objectInherit( osg.NodeVisitor.prototype, {
+    osg.createPrototypeObject( HideBBVisitor, osg.objectInherit( osg.NodeVisitor.prototype, {
         apply: function ( node ) {
             if ( node instanceof osgAnimation.RigGeometry ) {
                 node._boundingSphereComputed = true;
@@ -57,7 +57,7 @@
             }
             this.traverse( node );
         }
-    } );
+    } ) );
 
 
 
@@ -65,7 +65,7 @@
         osg.NodeVisitor.call( this, osg.NodeVisitor.TRAVERSE_ALL_CHILDREN );
         this._bones = [];
     };
-    FindBoneVisitor.prototype = osg.objectInherit( osg.NodeVisitor.prototype, {
+    osg.createPrototypeObject( FindBoneVisitor, osg.objectInherit( osg.NodeVisitor.prototype, {
         init: function () {},
         apply: function ( node ) {
 
@@ -87,12 +87,12 @@
             }
             return undefined;
         }
-    } );
+    } ) );
 
     var FindSkeletonVisitor = function () {
         osg.NodeVisitor.call( this, osg.NodeVisitor.TRAVERSE_ALL_CHILDREN );
     };
-    FindSkeletonVisitor.prototype = osg.objectInherit( osg.NodeVisitor.prototype, {
+    osg.createPrototypeObject( FindSkeletonVisitor, osg.objectInherit( osg.NodeVisitor.prototype, {
         apply: function ( node ) {
             if ( node instanceof osgAnimation.Skeleton ) {
                 this.skl = node;
@@ -100,7 +100,7 @@
             }
             this.traverse( node );
         }
-    } );
+    } ) );
 
 
     var createScene = function ( viewer, root, url, config, controller ) {

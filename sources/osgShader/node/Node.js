@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var Notify = require( 'osg/notify' );
 
 var instance = 0;
@@ -21,7 +22,7 @@ var Node = function () {
     this._text = undefined;
 };
 
-Node.prototype = {
+MACROUTILS.createPrototypeObject( Node, {
 
     getID: function () {
         return this._id;
@@ -153,7 +154,7 @@ Node.prototype = {
     getComment: function () {
         return this._comment;
     }
-};
+} );
 
 
 module.exports = Node;

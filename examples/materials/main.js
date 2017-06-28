@@ -14,7 +14,7 @@
         osg.NodeVisitor.call( this );
     };
 
-    VisitorCopyTexCoord.prototype = osg.objectInherit( osg.NodeVisitor.prototype, {
+    osg.createPrototypeObject( VisitorCopyTexCoord, osg.objectInherit( osg.NodeVisitor.prototype, {
         apply: function ( node ) {
             if ( node.getTypeID() === osg.Geometry.getTypeID() ) {
                 // copy tex coord 0 to 1 for multi texture
@@ -22,7 +22,7 @@
             }
             this.traverse( node );
         }
-    } );
+    } ) );
 
 
     var Example = function () {
@@ -104,7 +104,7 @@
 
     };
 
-    Example.prototype = {
+    osg.createPrototypeObject( Example, {
 
         initDatGUI: function () {
 
@@ -566,7 +566,7 @@
 
             this.initDatGUI();
         }
-    };
+    } );
 
     window.addEventListener( 'load', function () {
         var example = new Example();

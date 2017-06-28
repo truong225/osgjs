@@ -1,6 +1,6 @@
-// user performance if available or fallback
-
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
+
 var now = ( function () {
 
     var w = window || global;
@@ -33,7 +33,7 @@ Timer.instance = function () {
     return Timer._instance;
 };
 
-Timer.prototype = {
+MACROUTILS.createPrototypeObject( Timer, {
 
     // delta in seconds
     deltaS: function ( t0, t1 ) {
@@ -50,7 +50,7 @@ Timer.prototype = {
     }
 
 
-};
+} );
 
 
 module.exports = Timer;

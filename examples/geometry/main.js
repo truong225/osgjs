@@ -17,7 +17,7 @@
         };
     };
 
-    Example.prototype = osg.objectInherit( ExampleOSGJS.prototype, {
+    osg.createPrototypeObject( Example, osg.objectInherit( ExampleOSGJS.prototype, {
 
         // helpers
         createNormalArray: function ( size, x, y, z ) {
@@ -183,7 +183,7 @@
             this._viewer.getManipulator().computeHomePosition();
         }
 
-    } );
+    } ) );
 
     window.addEventListener( 'load', function () {
 

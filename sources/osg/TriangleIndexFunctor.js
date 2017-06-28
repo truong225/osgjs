@@ -1,5 +1,5 @@
 'use strict';
-
+var MACROUTILS = require( 'osg/Utils' );
 var primitiveSet = require( 'osg/primitiveSet' );
 var DrawElements = require( 'osg/DrawElements' );
 var DrawArrays = require( 'osg/DrawArrays' );
@@ -51,7 +51,7 @@ functorDrawArrays[ primitiveSet.TRIANGLE_FAN ] = function ( first, count, cb ) {
 };
 
 
-TriangleIndexFunctor.prototype = {
+MACROUTILS.createPrototypeObject( TriangleIndexFunctor, {
 
     // You feed it with a callback that will be called for each triangle
     // (with the 3 indexes of vertices as arguments)
@@ -91,6 +91,6 @@ TriangleIndexFunctor.prototype = {
             }
         }
     }
-};
+} );
 
 module.exports = TriangleIndexFunctor;

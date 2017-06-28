@@ -31,7 +31,7 @@ var main = function () {
 
     // That's where we update lights direction at each frame
     var LightUpdateCallback = function () {};
-    LightUpdateCallback.prototype = {
+    osg.createPrototypeObject( LightUpdateCallback, {
         update: function ( node, nv ) {
             var currentTime = nv.getFrameStamp().getSimulationTime();
 
@@ -74,7 +74,7 @@ var main = function () {
             }
             node.traverse( nv );
         }
-    };
+    } );
 
 
     var mainNode = new osg.Node();

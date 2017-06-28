@@ -12,7 +12,7 @@ module.exports = function () {
         NodeVisitor.call( this, NodeVisitor.TRAVERSE_ALL_CHILDREN );
         this._cb = undefined;
     };
-    FindAnimationManagerVisitor.prototype = MACROUTILS.objectInherit( NodeVisitor.prototype, {
+    MACROUTILS.createPrototypeObject( FindAnimationManagerVisitor, MACROUTILS.objectInherit( NodeVisitor.prototype, {
         getAnimationManager: function () {
             return this._cb;
         },
@@ -26,7 +26,7 @@ module.exports = function () {
             }
             this.traverse( node );
         }
-    } );
+    } ) );
 
     var getChannelsInfo = function ( animation ) {
 

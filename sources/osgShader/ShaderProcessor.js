@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/utils' );
 var Notify = require( 'osg/notify' );
 var shaderLib = require( 'osgShader/shaderLib' );
 var shadowShaderLib = require( 'osgShadow/shaderLib' );
@@ -26,7 +27,7 @@ var ShaderProcessor = function ( createInstance ) {
     return this;
 };
 
-ShaderProcessor.prototype = {
+MACROUTILS.createPrototypeObject( ShaderProcessor, {
     _shadersText: {},
     _shadersList: {},
     _globalDefaultprecision: '#ifdef GL_FRAGMENT_PRECISION_HIGH\n precision highp float;\n #else\n precision mediump float;\n#endif',
@@ -268,5 +269,6 @@ ShaderProcessor.prototype = {
         // See https://khronos.org/registry/gles/specs/2.0/GLSL_ES_Specification_1.0.17.pdf (p14-15: extension before any non-processor token)
         return strVersion + strExtensions + strPrecision + strDefines + strCore;
     }
-};
+}, 'osgShader', 'ShaderProcessor' );
+
 module.exports = ShaderProcessor;

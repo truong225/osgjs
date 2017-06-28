@@ -60,14 +60,14 @@ var Composer = function () {
     var UpdateCallback = function () {
 
     };
-    UpdateCallback.prototype = {
+    MACROUTILS.createPrototypeObject( UpdateCallback, {
         update: function ( node /*, nv */ ) {
             if ( node.isDirty() ) {
                 node.build();
             }
             return true;
         }
-    };
+    } );
     this.addUpdateCallback( new UpdateCallback() );
     // disable unecessarry drawing/states/check
     this.getOrCreateStateSet().setAttributeAndModes( new Depth( 'DISABLE' ) );

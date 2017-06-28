@@ -1,5 +1,5 @@
 'use strict';
-
+var MACROUTILS = require( 'osg/Utils' );
 var vec3 = require( 'osg/glMatrix' ).vec3;
 var PrimitiveFunctor = require( 'osg/PrimitiveFunctor' );
 var Plane = require( 'osg/Plane' );
@@ -28,7 +28,7 @@ var PolytopeIntersectFunctor = function ( settings ) {
     this._primitiveMask = intersectionEnums.ALL_PRIMITIVES;
 };
 
-PolytopeIntersectFunctor.prototype = {
+MACROUTILS.createPrototypeObject( PolytopeIntersectFunctor, {
 
     enter: function ( bbox ) {
         if ( this._settings._polytopeIntersector.getPolytope().containsBoundingBox( bbox ) ) {
@@ -296,14 +296,13 @@ PolytopeIntersectFunctor.prototype = {
                 operatorTriangle: function ( v1, v2, v3 ) {
                     self.operatorTriangle( v1, v2, v3 );
                 }
-            }
+            };
         };
         var pf = new PrimitiveFunctor( node, cb, vertices );
         pf.apply();
-    },
+    }
 
-
-};
+} );
 
 
 module.exports = PolytopeIntersectFunctor;

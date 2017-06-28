@@ -8,7 +8,7 @@ var SimpleUpdateCallback = function ( material ) {
     this.material = material;
 };
 
-SimpleUpdateCallback.prototype = {
+osg.createPrototypeObject( SimpleUpdateCallback, {
     // rotation angle
     alpha: 0,
 
@@ -31,7 +31,7 @@ SimpleUpdateCallback.prototype = {
 
         return true;
     }
-};
+} );
 
 function createScene() {
     var root = new osg.Node();

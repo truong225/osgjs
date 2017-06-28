@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var Notify = require( 'osg/notify' );
 var Timer = require( 'osg/Timer' );
 
@@ -12,7 +13,7 @@ var TextureProfile = function ( target, internalFormat, width, height ) {
     this.computeSize();
 };
 
-TextureProfile.prototype = {
+MACROUTILS.createPrototypeObject( TextureProfile, {
     match: function ( textureProfile ) {
         return textureProfile._target === this._target &&
             textureProfile._internalFormat === this._internalFormat &&
@@ -71,7 +72,8 @@ TextureProfile.prototype = {
         return this._size;
     }
 
-};
+} );
+
 TextureProfile.getHash = function () {
     var array = Array.prototype.slice.call( arguments );
     var hash = '';
@@ -88,7 +90,7 @@ var TextureObject = function ( texture, id, textureSet ) {
     this._textureSet = textureSet;
 };
 
-TextureObject.prototype = {
+MACROUTILS.createPrototypeObject( TextureObject, {
     target: function () {
         return this._textureSet._profile._target;
     },
@@ -105,7 +107,7 @@ TextureObject.prototype = {
     bind: function ( gl ) {
         gl.bindTexture( this.target(), this._id );
     }
-};
+} );
 
 var TextureObjectSet = function ( profile ) {
     this._profile = profile;
@@ -113,7 +115,7 @@ var TextureObjectSet = function ( profile ) {
     this._orphanedTextureObjects = [];
 };
 
-TextureObjectSet.prototype = {
+MACROUTILS.createPrototypeObject( TextureObjectSet, {
     getProfile: function () {
         return this._profile;
     },
@@ -188,14 +190,14 @@ TextureObjectSet.prototype = {
         this._orphanedTextureObjects.length = 0;
         Notify.info( 'TextureManager: released ' + nbTextures + ' with ' + ( nbTextures * size / ( 1024 * 1024 ) ) + ' MB' );
     }
-};
+} );
 
 
 var TextureManager = function () {
     this._textureSetMap = {};
 };
 
-TextureManager.prototype = {
+MACROUTILS.createPrototypeObject( TextureManager, {
 
     generateTextureObject: function ( gl,
         texture,
@@ -268,6 +270,6 @@ TextureManager.prototype = {
         }
     }
 
-};
+} );
 
 module.exports = TextureManager;

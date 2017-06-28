@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var primitiveSet = require( 'osg/primitiveSet' );
 
 
@@ -19,7 +20,7 @@ var DrawArrays = function ( mode, first, count ) {
 };
 
 /** @lends DrawArrays.prototype */
-DrawArrays.prototype = {
+MACROUTILS.createPrototypeObject( DrawArrays, {
     draw: function ( state ) {
         if ( this.count === 0 )
             return;
@@ -48,6 +49,6 @@ DrawArrays.prototype = {
         return this.first + i;
     }
 
-};
+} );
 
 module.exports = DrawArrays;

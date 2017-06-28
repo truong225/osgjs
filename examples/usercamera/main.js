@@ -170,7 +170,7 @@ var main = function () {
 
     // That's where we update lights direction at each frame
     var LightUpdateCallback = function () {};
-    LightUpdateCallback.prototype = {
+    osg.createPrototypeObject( LightUpdateCallback, {
         _inv: [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ],
         _deviceMatrix: new Float32Array( 16 ),
         _inverseDeviceMatrix: new Float32Array( 16 ),
@@ -233,7 +233,7 @@ var main = function () {
 
             node.traverse( nv );
         }
-    };
+    } );
 
 
     var mainNode = new osg.Node();

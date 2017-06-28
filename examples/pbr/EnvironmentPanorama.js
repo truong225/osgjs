@@ -16,7 +16,7 @@ window.EnvironmentPanorama = ( function () {
         else this._data = urlOrData;
     };
 
-    PanoramaEnv.prototype = {
+    osg.createPrototypeObject( PanoramaEnv, {
 
         getFile: function () {
             return this._file;
@@ -161,7 +161,7 @@ window.EnvironmentPanorama = ( function () {
             return texture;
         }
 
-    };
+    } );
 
     return PanoramaEnv;
 } )();

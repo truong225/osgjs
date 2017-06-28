@@ -47,7 +47,7 @@ CADManipulator.Interpolator = function () {
     this._height = undefined;
 };
 
-CADManipulator.Interpolator.prototype = {
+MACROUTILS.createPrototypeObject( CADManipulator.Interpolator, {
     setWidth: function ( width ) {
         this._width = width;
     },
@@ -106,7 +106,7 @@ CADManipulator.Interpolator.prototype = {
     getDelta: function () {
         return this._delta;
     }
-};
+} );
 
 CADManipulator.AvailableControllerList = [ 'StandardMouseKeyboard', 'Hammer' ];
 CADManipulator.ControllerList = [ 'StandardMouseKeyboard', 'Hammer' ];

@@ -23,7 +23,7 @@
         this._files = {};
     };
 
-    Environment.prototype = {
+    osg.createPrototypeObject( Environment, {
 
         loadPackage: function ( urlOfFile ) {
 
@@ -237,7 +237,7 @@
             return this._config;
         }
 
-    };
+    } );
 
     window.Environment = Environment;
 } )();

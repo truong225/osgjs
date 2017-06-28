@@ -1,6 +1,6 @@
 'use strict';
-var Notify = require( 'osg/notify' );
 var MACROUTILS = require( 'osg/Utils' );
+var Notify = require( 'osg/notify' );
 
 var OptionsDefault = {
     'antialias': true, // activate MSAA
@@ -95,7 +95,7 @@ Options.getOptionsURL = function () {
 
 };
 
-Options.prototype = {
+MACROUTILS.createPrototypeObject( Options, {
 
     extend: function ( options ) {
         MACROUTILS.objectMix( this, options );
@@ -128,6 +128,6 @@ Options.prototype = {
         this.extend( Options.getOptionsURL() );
     }
 
-};
+} );
 
 module.exports = Options;

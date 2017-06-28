@@ -1,9 +1,9 @@
 'use strict';
 
+var MACROUTILS = require( 'osg/Utils' );
 var Notify = require( 'osg/notify' );
 var Uniform = require( 'osg/Uniform' );
 var factory = require( 'osgShader/nodeFactory' );
-var MACROUTILS = require( 'osg/Utils' );
 var CompilerVertex = require( 'osgShader/CompilerVertex' );
 var CompilerFragment = require( 'osgShader/CompilerFragment' );
 
@@ -93,9 +93,7 @@ Compiler.setStateAttributeConfig( Compiler, {
 } );
 
 
-Compiler.prototype = MACROUTILS.extend( {}, CompilerVertex, CompilerFragment, {
-
-    constructor: Compiler,
+MACROUTILS.createPrototypeObject( Compiler, MACROUTILS.extend( {}, CompilerVertex, CompilerFragment, {
 
     createFragmentShader: function () {
         this._fragmentShaderMode = true;
@@ -778,7 +776,7 @@ Compiler.prototype = MACROUTILS.extend( {}, CompilerVertex, CompilerFragment, {
     evaluateExtensions: function ( roots ) {
         return this.evaluateAndGatherField( roots, 'getExtensions' );
     }
-} );
+} ), 'osgShader', 'Compiler' );
 
 
 module.exports = Compiler;

@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var vec2 = require( 'osg/glMatrix' ).vec2;
 
 
@@ -14,7 +15,7 @@ var StandardMouseKeyboard = function ( viewer ) {
     this._mousePosition = vec2.create();
 };
 
-StandardMouseKeyboard.prototype = {
+MACROUTILS.createPrototypeObject( StandardMouseKeyboard, {
 
     setEnable: function ( bool ) {
         this._enable = bool;
@@ -264,5 +265,5 @@ StandardMouseKeyboard.prototype = {
         this.getManipulatorController().setEventProxy( this );
     }
 
-};
+} );
 module.exports = StandardMouseKeyboard;

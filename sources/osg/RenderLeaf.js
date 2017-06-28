@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var StateGraph = require( 'osg/StateGraph' );
 
 // just use inline function, it's faster than having the test in the code
@@ -77,7 +78,7 @@ var RenderLeaf = function () {
     this._modelView = undefined;
 };
 
-RenderLeaf.prototype = {
+MACROUTILS.createPrototypeObject( RenderLeaf, {
 
     reset: function () {
         this._parent = undefined;
@@ -225,6 +226,6 @@ RenderLeaf.prototype = {
         };
     } )()
 
-};
+} );
 
 module.exports = RenderLeaf;

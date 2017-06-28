@@ -14,7 +14,7 @@
         };
     };
 
-    Example.prototype = osg.objectInherit( ExampleOSGJS.prototype, {
+    osg.createPrototypeObject( Example, osg.objectInherit( ExampleOSGJS.prototype, {
 
 
         initDatGUI: function () {
@@ -33,7 +33,7 @@
         }
 
 
-    } );
+    } ) );
 
 
     window.addEventListener( 'load', function () {

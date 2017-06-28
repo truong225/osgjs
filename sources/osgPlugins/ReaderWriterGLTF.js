@@ -1,5 +1,5 @@
 'use strict';
-
+var MACROUTILS = require( 'osg/Utils' );
 var P = require( 'bluebird' );
 var requestFile = require( 'osgDB/requestFile' );
 var Input = require( 'osgDB/Input' );
@@ -97,7 +97,7 @@ ReaderWriterGLTF.SPECULAR_UNIFORM = 'specularMap';
 ReaderWriterGLTF.NORMAL_UNIFORM = 'normalMap';
 ReaderWriterGLTF.AO_UNIFORM = 'aoMap';
 
-ReaderWriterGLTF.prototype = {
+MACROUTILS.createPrototypeObject( ReaderWriterGLTF, {
 
     init: function () {
 
@@ -860,7 +860,7 @@ ReaderWriterGLTF.prototype = {
         } );
     } )
 
-};
+} );
 
 Registry.instance().addReaderWriter( 'gltf', new ReaderWriterGLTF() );
 

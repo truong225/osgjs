@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var vec2 = require( 'osg/glMatrix' ).vec2;
 
 
@@ -7,7 +8,7 @@ var OrbitManipulatorGamePadController = function ( manipulator ) {
     this.init();
 };
 
-OrbitManipulatorGamePadController.prototype = {
+MACROUTILS.createPrototypeObject( OrbitManipulatorGamePadController, {
     init: function () {
         this._delay = 0.15;
         this._threshold = 0.08;
@@ -109,5 +110,6 @@ OrbitManipulatorGamePadController.prototype = {
             }
         }
     }
-};
+} );
+
 module.exports = OrbitManipulatorGamePadController;

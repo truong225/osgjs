@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var mat4 = require( 'osg/glMatrix' ).mat4;
 var vec3 = require( 'osg/glMatrix' ).vec3;
 
@@ -12,7 +13,7 @@ var EllipsoidModel = function () {
 EllipsoidModel.WGS_84_RADIUS_EQUATOR = 6378137.0;
 EllipsoidModel.WGS_84_RADIUS_POLAR = 6356752.3142;
 
-EllipsoidModel.prototype = {
+MACROUTILS.createPrototypeObject( EllipsoidModel, {
     setRadiusEquator: function ( radius ) {
         this._radiusEquator = radius;
         this.computeCoefficients();
@@ -122,6 +123,6 @@ EllipsoidModel.prototype = {
                 0, 0, 0, 1 );
         };
     } )()
-};
+} );
 
 module.exports = EllipsoidModel;

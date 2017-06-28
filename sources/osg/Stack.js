@@ -1,4 +1,6 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
+
 var Stack = function () {
     this.globalDefault = undefined;
     this.lastApplied = undefined;
@@ -8,7 +10,7 @@ var Stack = function () {
     this.back = undefined;
 };
 
-Stack.prototype = {
+MACROUTILS.createPrototypeObject( Stack, {
     push: function ( value ) {
         this.values.push( value );
         this.back = value;
@@ -19,6 +21,6 @@ Stack.prototype = {
         this.back = values[ values.length - 1 ];
         return value;
     }
-};
+} );
 
 module.exports = Stack;

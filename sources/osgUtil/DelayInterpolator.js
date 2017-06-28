@@ -1,3 +1,4 @@
+var MACROUTILS = require( 'osg/Utils' );
 var DelayInterpolator = function ( size, delay ) {
     this._current = new Float32Array( size );
     this._target = new Float32Array( size );
@@ -8,7 +9,7 @@ var DelayInterpolator = function ( size, delay ) {
     this.reset();
 };
 
-DelayInterpolator.prototype = {
+MACROUTILS.createPrototypeObject( DelayInterpolator, {
     setDelay: function ( delay ) {
         this._delay = delay;
     },
@@ -68,6 +69,6 @@ DelayInterpolator.prototype = {
     setStart: function ( start ) {
         this._start = start;
     }
-};
+} );
 
 module.exports = DelayInterpolator;

@@ -17,7 +17,8 @@
         this._options = options;
         this._config = config;
     };
-    CountCallback.prototype = {
+
+    osg.createPrototypeObject( CountCallback, {
 
         update: function ( /*node, nv*/) {
             // update
@@ -25,7 +26,7 @@
             culled = 0;
             return true;
         }
-    };
+    } );
 
 
 
@@ -36,7 +37,7 @@
 
     // The Way of  getting the near/far, only on camera for main render
 
-    CustomCullVisitor.prototype = osg.objectInherit( osg.CullVisitor.prototype, {
+    osg.createPrototypeObject( CustomCullVisitor, osg.objectInherit( osg.CullVisitor.prototype, {
 
         // this one
         popCameraModelViewProjectionMatrix: function ( camera ) {
@@ -54,7 +55,7 @@
             }
         }
 
-    } );
+    } ) );
 
 
     // TODO:
@@ -123,7 +124,7 @@
     var FrustumCullingDebugCallback = function ( options ) {
         this._options = options;
     };
-    FrustumCullingDebugCallback.prototype = {
+    osg.createPrototypeObject( FrustumCullingDebugCallback, {
         update: function ( node, nv ) {
             // update
             var topView = false;
@@ -173,9 +174,9 @@
             }
             return true;
         }
-    };
+    } );
 
-    Example.prototype = {
+    osg.createPrototypeObject( Example, {
 
 
         initDatGUI: function () {
@@ -518,7 +519,7 @@ bs.getOrCreateStateSet().setTextureAttributeAndModes( 0, new osg.Texture(), osg.
 
             this.initDatGUI();
         }
-    };
+    } );
 
     window.addEventListener( 'load', function () {
         var example = new Example();

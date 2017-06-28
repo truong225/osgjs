@@ -1,5 +1,5 @@
 'use strict';
-
+var MACROUTILS = require( 'osg/Utils' );
 var Notify = require( 'osg/notify' );
 var WebGLCaps = require( 'osg/WebGLCaps' );
 
@@ -71,7 +71,7 @@ TimerGPU.instance = function ( gl ) {
 
 };
 
-TimerGPU.prototype = {
+MACROUTILS.createPrototypeObject( TimerGPU, {
 
     getContext: function () {
         return this._gl;
@@ -381,6 +381,6 @@ TimerGPU.prototype = {
         return query._averageTimer;
     }
 
-};
+} );
 
 module.exports = TimerGPU;

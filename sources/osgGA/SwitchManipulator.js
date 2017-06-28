@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 
 /**
  *  OrbitManipulator
@@ -10,7 +11,7 @@ var SwitchManipulator = function () {
 };
 
 /** @lends SwitchManipulator.prototype */
-SwitchManipulator.prototype = {
+MACROUTILS.createPrototypeObject( SwitchManipulator, {
     getCamera: function () {
         return this.getCurrentManipulator().getCamera();
     },
@@ -80,6 +81,6 @@ SwitchManipulator.prototype = {
     getHomeDistance: function ( bs ) {
         return this.getCurrentManipulator().getHomeDistance( bs );
     }
-};
+} );
 
 module.exports = SwitchManipulator;

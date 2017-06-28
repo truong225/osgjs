@@ -12,7 +12,7 @@ window.IntegrateBRDFMap = ( function () {
         else this._data = urlOrData;
     };
 
-    IntegrateBRDFMap.prototype = {
+    osg.createPrototypeObject( IntegrateBRDFMap, {
 
         createTexture: function ( image ) {
             var texture = new osg.Texture();
@@ -70,7 +70,7 @@ window.IntegrateBRDFMap = ( function () {
 
         }
 
-    };
+    } );
 
     return IntegrateBRDFMap;
 } )();

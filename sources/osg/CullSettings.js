@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 
 
 var CullSettings = function () {
@@ -11,7 +12,7 @@ var CullSettings = function () {
 
 };
 
-CullSettings.prototype = {
+MACROUTILS.createPrototypeObject( CullSettings, {
     reset: function () {
 
         this._computeNearFar = true;
@@ -90,6 +91,6 @@ CullSettings.prototype = {
         return this._LODScale;
     }
 
-};
+} );
 
 module.exports = CullSettings;

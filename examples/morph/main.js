@@ -14,7 +14,7 @@
         osg.NodeVisitor.call( this, osg.NodeVisitor.TRAVERSE_ALL_CHILDREN );
         this._cb = undefined;
     };
-    FindAnimationManagerVisitor.prototype = osg.objectInherit( osg.NodeVisitor.prototype, {
+    osg.createPrototypeObject( FindAnimationManagerVisitor, osg.objectInherit( osg.NodeVisitor.prototype, {
         getAnimationManager: function () {
             return this._cb;
         },
@@ -28,7 +28,7 @@
             }
             this.traverse( node );
         }
-    } );
+    } ) );
 
 
     // inherits for the ExampleOSGJS prototype
@@ -49,7 +49,7 @@
         this._modelPath = '../media/models/animation/';
     };
 
-    Example.prototype = osg.objectInherit( ExampleOSGJS.prototype, {
+    osg.createPrototypeObject( Example, osg.objectInherit( ExampleOSGJS.prototype, {
 
 
         initDatGUI: function () {
@@ -123,8 +123,8 @@
             }
 
             return this._model;
-        },
-    } );
+        }
+    } ) );
 
 
     window.addEventListener( 'load', function () {

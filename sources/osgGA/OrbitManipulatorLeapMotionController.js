@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var Notify = require( 'osg/notify' );
 var vec3 = require( 'osg/glMatrix' ).vec3;
 var vec2 = require( 'osg/glMatrix' ).vec2;
@@ -37,7 +38,7 @@ var ModeConfig = {
     }
 };
 
-OrbitManipulatorLeapMotionController.prototype = {
+MACROUTILS.createPrototypeObject( OrbitManipulatorLeapMotionController, {
     init: function () {
         this._virtualCursor = vec2.fromValues( 0.0, 0.0 );
         this._targetPosition = vec2.fromValues( 0.0, 0.0 );
@@ -177,5 +178,5 @@ OrbitManipulatorLeapMotionController.prototype = {
 
         this._motion[ 1 ] = this._motion[ 0 ] = 0;
     }
-};
+} );
 module.exports = OrbitManipulatorLeapMotionController;

@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var Leap = require( 'leap' );
 var Notify = require( 'osg/notify' );
 
@@ -8,7 +9,7 @@ var LeapMotion = function ( viewer ) {
     this._enable = true;
 };
 
-LeapMotion.prototype = {
+MACROUTILS.createPrototypeObject( LeapMotion, {
 
     setEnable: function ( bool ) {
         this._enable = bool;
@@ -67,5 +68,5 @@ LeapMotion.prototype = {
             manipulatorAdapter.update( frame );
         }
     }
-};
+} );
 module.exports = LeapMotion;

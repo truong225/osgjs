@@ -114,7 +114,7 @@
 
     };
 
-    PBRWorklowVisitor.prototype = osg.objectInherit( osg.NodeVisitor.prototype, {
+    osg.createPrototypeObject( PBRWorklowVisitor, osg.objectInherit( osg.NodeVisitor.prototype, {
         apply: function ( node ) {
             var data = node.getUserData();
             if ( data && data.pbrWorklow ) {
@@ -129,7 +129,7 @@
         getWorkflows: function () {
             return this._workflow;
         }
-    } );
+    } ) );
 
     var shaderProcessor = new osgShader.ShaderProcessor();
 
@@ -231,7 +231,7 @@
 
     };
 
-    Example.prototype = {
+    osg.createPrototypeObject( Example, {
 
 
         createEnvironment: function ( urlOrZip, zipFileName ) {
@@ -1346,8 +1346,7 @@
             return result;
         }
 
-
-    };
+    } );
 
     var dragOverEvent = function ( evt ) {
 

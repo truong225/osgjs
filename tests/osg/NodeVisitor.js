@@ -15,7 +15,7 @@ module.exports = function () {
             this.result = [];
         };
 
-        FindItemAnchor.prototype = MACROUTILS.objectInherit( NodeVisitor.prototype, {
+        MACROUTILS.createPrototypeObject( FindItemAnchor, MACROUTILS.objectInherit( NodeVisitor.prototype, {
             apply: function ( node ) {
                 if ( node.getName !== undefined ) {
                     var name = node.getName();
@@ -25,7 +25,7 @@ module.exports = function () {
                 }
                 this.traverse( node );
             }
-        } );
+        } ) );
 
         var root = new Node();
         root.setName( 'a' );
@@ -52,12 +52,12 @@ module.exports = function () {
                 NodeVisitor.call( this, NodeVisitor.TRAVERSE_PARENTS );
                 this.node = undefined;
             };
-            GetRootItem.prototype = MACROUTILS.objectInherit( NodeVisitor.prototype, {
+            MACROUTILS.createPrototypeObject( GetRootItem, MACROUTILS.objectInherit( NodeVisitor.prototype, {
                 apply: function ( node ) {
                     this.node = node;
                     this.traverse( node );
                 }
-            } );
+            } ) );
 
             var root = new Node();
             root.setName( 'root' );

@@ -32,7 +32,7 @@ var onLoad = function () {
         this._name = name;
     };
 
-    FindByNameVisitor.prototype = osg.objectInherit( osg.NodeVisitor.prototype, {
+    osg.createPrototypeObject( FindByNameVisitor, osg.objectInherit( osg.NodeVisitor.prototype, {
         // in found we'll store our resulting matching node
         init: function () {
             this.found = undefined;
@@ -45,7 +45,7 @@ var onLoad = function () {
             }
             this.traverse( node );
         }
-    } );
+    } ) );
 
     // we look for a node named 'Light.003'
     var finder = new FindByNameVisitor( 'Light.003' );

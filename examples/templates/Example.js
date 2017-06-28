@@ -50,7 +50,7 @@
         this._debugDepthProgram = undefined;
     };
 
-    Example.prototype = {
+    osg.createPrototypeObject( Example, {
 
         run: function ( options ) {
 
@@ -419,7 +419,7 @@
 
         }
 
-    };
+    } );
 
     window.ExampleOSGJS = Example;
 } )();

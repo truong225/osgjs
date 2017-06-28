@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var assert = require( 'chai' ).assert;
 var Camera = require( 'osg/Camera' );
 var mat4 = require( 'osg/glMatrix' ).mat4;
@@ -26,7 +27,7 @@ module.exports = function () {
         this.stackTransforms = [];
     };
 
-    DummyIntersector.prototype = {
+    MACROUTILS.createPrototypeObject( DummyIntersector, {
         enter: function () {
             return true;
         },
@@ -37,7 +38,7 @@ module.exports = function () {
         intersect: function () {
             return true;
         }
-    };
+    } );
 
     test( 'IntersectionVisitor with 1 camera', function () {
 

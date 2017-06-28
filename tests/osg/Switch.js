@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var assert = require( 'chai' ).assert;
 var mockup = require( 'tests/mockup/mockup' );
 var Node = require( 'osg/Node' );
@@ -27,14 +28,14 @@ module.exports = function () {
             NodeVisitor.call( this, NodeVisitor.TRAVERSE_ACTIVE_CHILDREN );
         };
 
-        TestVisitor.prototype = Utils.objectInherit( NodeVisitor.prototype, {
+        MACROUTILS.createPrototypeObject( TestVisitor, Utils.objectInherit( NodeVisitor.prototype, {
             apply: function ( node ) {
                 if ( node.getName !== undefined ) {
                     assert.isOk( node.getName() !== 'disabled', 'only enabled child should be traversed' );
                 }
                 this.traverse( node );
             }
-        } );
+        } ) );
 
         var testVisitor = new TestVisitor();
         testVisitor.apply( switchNode );

@@ -58,7 +58,7 @@ var ShadowSettings = function ( options ) {
 
 ShadowSettings.kernelSizeList = kernelSizeList;
 
-ShadowSettings.prototype = {
+MACROUTILS.createPrototypeObject( ShadowSettings, {
 
     setCastsShadowDrawTraversalMask: function ( mask ) {
         this.castsShadowDrawTraversalMask = mask;
@@ -106,6 +106,6 @@ ShadowSettings.prototype = {
         return this.shadowCastShaderGeneratorName;
     }
 
-};
+} );
 
 module.exports = ShadowSettings;

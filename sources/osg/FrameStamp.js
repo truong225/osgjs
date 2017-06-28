@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 
 var FrameStamp = function () {
     this._frame = 0;
@@ -7,7 +8,7 @@ var FrameStamp = function () {
     this._deltaTime = 0.0; // last time elapsed since the next traversal
 };
 
-FrameStamp.prototype = {
+MACROUTILS.createPrototypeObject( FrameStamp, {
     setReferenceTime: function ( s ) {
         this._startSimulation = s;
     },
@@ -32,6 +33,6 @@ FrameStamp.prototype = {
     getFrameNumber: function () {
         return this._frame;
     }
-};
+} );
 
 module.exports = FrameStamp;

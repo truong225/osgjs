@@ -1,5 +1,5 @@
 'use strict';
-
+var MACROUTILS = require( 'osg/Utils' );
 var DisplayGraphRenderer = require( 'osgUtil/DisplayGraphRenderer' );
 var DisplayGraphNode = require( 'osgUtil/DisplayGraphNode' );
 var Notify = require( 'osg/notify' );
@@ -52,7 +52,8 @@ var SimpleTooltips = function ( options ) {
         nodes[ i ].addEventListener( 'mouseout', this.hideTooltip.bind( this ), false );
     }
 };
-SimpleTooltips.prototype = {
+
+MACROUTILS.createPrototypeObject( SimpleTooltips, {
     showTooltip: function ( e ) {
         if ( !$ ) return;
 
@@ -65,7 +66,7 @@ SimpleTooltips.prototype = {
     hideTooltip: function () {
         this.el.style.display = 'none';
     }
-};
+} );
 
 var DisplayGraph = function () {
 
@@ -100,7 +101,7 @@ DisplayGraph.instance = function () {
     return DisplayGraph._instance;
 };
 
-DisplayGraph.prototype = {
+MACROUTILS.createPrototypeObject( DisplayGraph, {
     getColorFromClassName: DisplayGraphNode.prototype.getColorFromClassName,
 
     setCallbackSelect: function ( cb ) {
@@ -288,6 +289,6 @@ DisplayGraph.prototype = {
         css.innerHTML = this._css;
         document.getElementsByTagName( 'head' )[ 0 ].appendChild( css );
     }
-};
+} );
 
 module.exports = DisplayGraph;

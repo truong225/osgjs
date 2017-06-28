@@ -24,7 +24,7 @@
         };
     };
 
-    Example.prototype = {
+    osg.createPrototypeObject( Example, {
 
         createTileForGeometry: function ( i, x, y, width, height ) {
 
@@ -162,7 +162,7 @@
                 this.gui.__controllers[ i ].updateDisplay();
             this.viewer.run();
         }
-    };
+    } );
 
     window.addEventListener( 'load', function () {
         var example = new Example();

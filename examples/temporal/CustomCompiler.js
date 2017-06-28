@@ -15,7 +15,7 @@ var CustomCompiler;
     config.attribute.push( 'Temporal' );
     osgShader.Compiler.setStateAttributeConfig( CustomCompiler, config );
 
-    CustomCompiler.prototype = osg.objectInherit( osgShader.Compiler.prototype, {
+    osg.createPrototypeObject( CustomCompiler, osg.objectInherit( osgShader.Compiler.prototype, {
 
         getOrCreateProjectionMatrix: function () {
             var projMat = this.getVariable( 'projectionMatrix' );
@@ -50,6 +50,6 @@ var CustomCompiler;
 
         }
 
-    } );
+    } ) );
 
 } )();

@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var Hammer = require( 'hammer' );
 
 
@@ -11,7 +12,7 @@ var HammerController = function ( viewer ) {
 
 };
 
-HammerController.prototype = {
+MACROUTILS.createPrototypeObject( HammerController, {
 
     setEnable: function ( bool ) {
         this._enable = bool;
@@ -80,5 +81,5 @@ HammerController.prototype = {
         this.getManipulatorController().removeEventProxy( this._hammer );
     }
 
-};
+} );
 module.exports = HammerController;

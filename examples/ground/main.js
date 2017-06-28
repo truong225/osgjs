@@ -16,7 +16,7 @@
 
     var Example = function () {};
 
-    Example.prototype = {
+    osg.createPrototypeObject( Example, {
 
         // the root node
         scene: undefined,
@@ -115,7 +115,7 @@
                 this.setModel( model );
             }.bind( this ) );
         }
-    };
+    } );
 
     window.addEventListener( 'load', function () {
         var example = new Example();

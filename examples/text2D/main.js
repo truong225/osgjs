@@ -21,7 +21,7 @@
         ];
     };
 
-    Example.prototype = {
+    osg.createPrototypeObject( Example, {
 
         initGui: function () {
             this.gui = new window.dat.GUI( {
@@ -149,14 +149,14 @@
                 osg.NodeVisitor.call( this, osg.NodeVisitor.TRAVERSE_ALL_CHILDREN );
                 this._text = text;
             };
-            TextVisitor.prototype = osg.objectInherit( osg.NodeVisitor.prototype, {
+            osg.createPrototypeObject( TextVisitor, osg.objectInherit( osg.NodeVisitor.prototype, {
                 apply: function ( node ) {
                     if ( node instanceof osgText.Text ) {
                         node.setText( this._text );
                     }
                     this.traverse( node );
                 }
-            } );
+            } ) );
             var tv = new TextVisitor( text );
             this._scene.accept( tv );
         },
@@ -166,14 +166,14 @@
                 osg.NodeVisitor.call( this, osg.NodeVisitor.TRAVERSE_ALL_CHILDREN );
                 this._fontResolution = value;
             };
-            TextVisitor.prototype = osg.objectInherit( osg.NodeVisitor.prototype, {
+            osg.createPrototypeObject( TextVisitor, osg.objectInherit( osg.NodeVisitor.prototype, {
                 apply: function ( node ) {
                     if ( node instanceof osgText.Text ) {
                         node.setFontResolution( this._fontResolution );
                     }
                     this.traverse( node );
                 }
-            } );
+            } ) );
             var tv = new TextVisitor( value );
             this._scene.accept( tv );
         },
@@ -183,14 +183,14 @@
                 osg.NodeVisitor.call( this, osg.NodeVisitor.TRAVERSE_ALL_CHILDREN );
                 this._characterSize = value;
             };
-            TextVisitor.prototype = osg.objectInherit( osg.NodeVisitor.prototype, {
+            osg.createPrototypeObject( TextVisitor, osg.objectInherit( osg.NodeVisitor.prototype, {
                 apply: function ( node ) {
                     if ( node instanceof osgText.Text ) {
                         node.setCharacterSize( this._characterSize );
                     }
                     this.traverse( node );
                 }
-            } );
+            } ) );
             var tv = new TextVisitor( value );
             this._scene.accept( tv );
         },
@@ -200,14 +200,14 @@
                 osg.NodeVisitor.call( this, osg.NodeVisitor.TRAVERSE_ALL_CHILDREN );
                 this._fontFamily = value;
             };
-            TextVisitor.prototype = osg.objectInherit( osg.NodeVisitor.prototype, {
+            osg.createPrototypeObject( TextVisitor, osg.objectInherit( osg.NodeVisitor.prototype, {
                 apply: function ( node ) {
                     if ( node instanceof osgText.Text ) {
                         node.setFont( this._fontFamily );
                     }
                     this.traverse( node );
                 }
-            } );
+            } ) );
             var tv = new TextVisitor( value );
             this._scene.accept( tv );
         },
@@ -216,14 +216,14 @@
                 osg.NodeVisitor.call( this, osg.NodeVisitor.TRAVERSE_ALL_CHILDREN );
                 this._rotateToScreen = value;
             };
-            TextVisitor.prototype = osg.objectInherit( osg.NodeVisitor.prototype, {
+            osg.createPrototypeObject( TextVisitor, osg.objectInherit( osg.NodeVisitor.prototype, {
                 apply: function ( node ) {
                     if ( node instanceof osgText.Text ) {
                         node.setAutoRotateToScreen( this._rotateToScreen );
                     }
                     this.traverse( node );
                 }
-            } );
+            } ) );
             var tv = new TextVisitor( value );
             this._scene.accept( tv );
         },
@@ -236,14 +236,14 @@
                 else
                     this._layout = osgText.Text.RIGHT_TO_LEFT;
             };
-            TextVisitor.prototype = osg.objectInherit( osg.NodeVisitor.prototype, {
+            osg.createPrototypeObject( TextVisitor, osg.objectInherit( osg.NodeVisitor.prototype, {
                 apply: function ( node ) {
                     if ( node instanceof osgText.Text ) {
                         node.setLayout( this._layout );
                     }
                     this.traverse( node );
                 }
-            } );
+            } ) );
             var tv = new TextVisitor( value );
             this._scene.accept( tv );
         },
@@ -253,14 +253,14 @@
                 osg.NodeVisitor.call( this, osg.NodeVisitor.TRAVERSE_ALL_CHILDREN );
                 this._alignment = parseInt( value );
             };
-            TextVisitor.prototype = osg.objectInherit( osg.NodeVisitor.prototype, {
+            osg.createPrototypeObject( TextVisitor, osg.objectInherit( osg.NodeVisitor.prototype, {
                 apply: function ( node ) {
                     if ( node instanceof osgText.Text ) {
                         node.setAlignment( this._alignment );
                     }
                     this.traverse( node );
                 }
-            } );
+            } ) );
             var tv = new TextVisitor( value );
             this._scene.accept( tv );
         },
@@ -270,14 +270,14 @@
                 osg.NodeVisitor.call( this, osg.NodeVisitor.TRAVERSE_ALL_CHILDREN );
                 this._characterSizeMode = parseInt( value );
             };
-            TextVisitor.prototype = osg.objectInherit( osg.NodeVisitor.prototype, {
+            osg.createPrototypeObject( TextVisitor, osg.objectInherit( osg.NodeVisitor.prototype, {
                 apply: function ( node ) {
                     if ( node instanceof osgText.Text ) {
                         node.setCharacterSizeMode( this._characterSizeMode );
                     }
                     this.traverse( node );
                 }
-            } );
+            } ) );
             var tv = new TextVisitor( value );
             this._scene.accept( tv );
         },
@@ -332,7 +332,7 @@
             // Check if autorotate and autoscale works with picking
             canvas.addEventListener( 'click', this.onMouseClick.bind( this, canvas, this.viewer ), true );
         }
-    };
+    } );
 
     window.addEventListener( 'load', function () {
         var example = new Example();

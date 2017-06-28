@@ -53,7 +53,7 @@ var InfoCollector = function () {
     this._numVertexIndices = 0;
 };
 
-InfoCollector.prototype = {
+MACROUTILS.createPrototypeObject( InfoCollector, {
 
     apply: function ( node ) {
         if ( !node.getAttributes().Vertex ) {
@@ -74,12 +74,12 @@ InfoCollector.prototype = {
                 operatorTriangle: function () {
                     self._numVertexIndices += 4;
                 }
-            }
+            };
         };
         var pf = new PrimitiveIndexFunctor( node, cb );
         pf.apply();
     }
-};
+} );
 
 
 var PrimitiveIndicesCollector = function ( buildKdTree ) {
@@ -87,7 +87,7 @@ var PrimitiveIndicesCollector = function ( buildKdTree ) {
     this._numIndices = 0;
 };
 
-PrimitiveIndicesCollector.prototype = {
+MACROUTILS.createPrototypeObject( PrimitiveIndicesCollector, {
 
     buildKdTreePoint: function ( i0 ) {
         var vertices = this._buildKdTree._kdTree.getVertices();
@@ -204,12 +204,12 @@ PrimitiveIndicesCollector.prototype = {
                 operatorTriangle: function ( i1, i2, i3 ) {
                     self.buildKdTreeTriangle( i1, i2, i3 );
                 }
-            }
+            };
         };
         var pf = new PrimitiveIndexFunctor( node, cb );
         pf.apply();
     }
-};
+} );
 
 
 
@@ -222,7 +222,7 @@ var BuildKdTree = function ( kdTree ) {
     this._stackLength = 0;
 };
 
-BuildKdTree.prototype = {
+MACROUTILS.createPrototypeObject( BuildKdTree, {
     build: function ( options, geom ) {
         var targetTris = options._targetNumTrianglesPerLeaf;
         var vertexAttrib = geom.getVertexAttributeList().Vertex;
@@ -462,9 +462,9 @@ BuildKdTree.prototype = {
         bmax[ 0 ] = maxx + epsilon;
         bmax[ 1 ] = maxy + epsilon;
         bmax[ 2 ] = maxz + epsilon;
-    },
+    }
 
-};
+} );
 
 var KdTree = function () {
     this._vertices = null;

@@ -8,7 +8,8 @@
     var FPSUpdateCallback = function ( config ) {
         this._config = config;
     };
-    FPSUpdateCallback.prototype = {
+
+    osg.createPrototypeObject( FPSUpdateCallback, {
         update: function ( node, nv ) {
 
             var currentTime = 1000.0 * nv.getFrameStamp().getDeltaTime();
@@ -23,7 +24,7 @@
             //
             node.traverse( nv );
         }
-    };
+    } );
 
     // inherits for the ExampleOSGJS prototype
     var Example = function () {
@@ -68,8 +69,7 @@
     };
 
 
-    Example.prototype = osg.objectInherit( ExampleOSGJS.prototype, {
-
+    osg.createPrototypeObject( Example, osg.objectInherit( ExampleOSGJS.prototype, {
 
         createComplexStateSet: function () {
             // to stress test the internal system state.push/popStateSet and applyStateSet
@@ -286,7 +286,7 @@
             return this._rootItems;
         }
 
-    } );
+    } ) );
 
 
     window.addEventListener( 'load', function () {

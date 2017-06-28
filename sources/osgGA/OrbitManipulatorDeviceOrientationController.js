@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var quat = require( 'osg/glMatrix' ).quat;
 var vec3 = require( 'osg/glMatrix' ).vec3;
 
@@ -10,7 +11,7 @@ var OrbitManipulatorDeviceOrientationController = function ( manipulator ) {
     this.init();
 };
 
-OrbitManipulatorDeviceOrientationController.prototype = {
+MACROUTILS.createPrototypeObject( OrbitManipulatorDeviceOrientationController, {
 
     init: function () {
         this._stepFactor = 1.0; // meaning radius*stepFactor to move
@@ -25,6 +26,6 @@ OrbitManipulatorDeviceOrientationController.prototype = {
         this._manipulator.setPoseVR( this._quat, this._pos );
     }
 
-};
+} );
 
 module.exports = OrbitManipulatorDeviceOrientationController;

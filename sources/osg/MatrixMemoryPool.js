@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var mat4 = require( 'osg/glMatrix' ).mat4;
 
 
@@ -17,7 +18,7 @@ var MatrixMemoryPool = function () {
 
 
 /** @lends MatrixMemoryPool.prototype */
-MatrixMemoryPool.prototype = {
+MACROUTILS.createPrototypeObject( MatrixMemoryPool, {
 
     // start reuse the stack
     reset: function () {
@@ -40,6 +41,6 @@ MatrixMemoryPool.prototype = {
 
     }
 
-};
+} );
 
 module.exports = MatrixMemoryPool;

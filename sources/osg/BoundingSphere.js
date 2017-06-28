@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require( 'osg/Utils' );
 var BoundingBox = require( 'osg/BoundingBox' );
 var vec3 = require( 'osg/glMatrix' ).vec3;
 var mat4 = require( 'osg/glMatrix' ).mat4;
@@ -9,7 +10,8 @@ var BoundingSphere = function () {
     this._radius = -1.0;
 };
 
-BoundingSphere.prototype = {
+MACROUTILS.createPrototypeObject( BoundingSphere, {
+
     init: function () {
         vec3.init( this._center );
         this._radius = -1.0;
@@ -179,6 +181,6 @@ BoundingSphere.prototype = {
         };
     } )()
 
-};
+} );
 
 module.exports = BoundingSphere;

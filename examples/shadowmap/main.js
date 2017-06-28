@@ -159,7 +159,7 @@
         this._directLightChange = false; // GUI change, mmm
 
     };
-    LightUpdateCallback.prototype = {
+    osg.createPrototypeObject( LightUpdateCallback, {
         update: function ( node, nv ) {
             var currentTime = nv.getFrameStamp().getSimulationTime();
             //
@@ -259,9 +259,9 @@
             this._last = currentTime;
             node.traverse( nv );
         }
-    };
+    } );
 
-    Example.prototype = osg.objectInherit( ExampleOSGJS.prototype, {
+    osg.createPrototypeObject( Example, osg.objectInherit( ExampleOSGJS.prototype, {
 
         /*
          *   UI user choices
@@ -1145,7 +1145,7 @@
 
             this.updateShadow();
         }
-    } );
+    } ) );
 
     // execute loaded code when ready
     window.addEventListener( 'load', function () {
