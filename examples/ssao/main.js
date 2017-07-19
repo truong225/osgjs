@@ -196,7 +196,6 @@
         },
 
         readShaders: function() {
-            var defer = P.defer();
             var self = this;
 
             var shaderNames = [
@@ -218,7 +217,7 @@
                 promises.push(P.resolve($.get(shader)));
             });
 
-            P.all(promises).then(function(args) {
+            return P.all(promises).then(function(args) {
                 var shaderNameContent = {};
                 shaderNames.forEach(function(name, idx) {
                     shaderNameContent[name] = args[idx];
@@ -232,11 +231,7 @@
                     new osg.Shader('VERTEX_SHADER', vertexshader),
                     new osg.Shader('FRAGMENT_SHADER', fragmentshader)
                 );
-
-                defer.resolve();
             });
-
-            return defer.promise;
         },
 
         createTexture: function(name, filter, type, size) {

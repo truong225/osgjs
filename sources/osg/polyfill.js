@@ -1,5 +1,21 @@
 'use strict';
 
+// Enable bluebird warnings for development
+
+/*develblock:start*/
+var P = require('bluebird');
+P.config({
+    // Enable warnings
+    warnings: true,
+    // Enable long stack traces
+    longStackTraces: true,
+    // Enable cancellation
+    cancellation: true,
+    // Enable monitoring
+    monitoring: true
+});
+/*develblock:end*/
+
 // This file contains needed polyfills mainly for IE11
 
 // IE11 does not support Set with constructing arguments. May 2017.
