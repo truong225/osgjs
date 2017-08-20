@@ -101,7 +101,7 @@ MACROUTILS.createPrototypeObject(
         },
 
         copyLeavesFromStateGraphListToRenderLeafList: function() {
-            this._leafs.splice(0, this._leafs.length);
+            this._leafs.length = 0;
             var detectedNaN = false;
 
             for (var i = 0, l = this.stateGraphList.length; i < l; i++) {

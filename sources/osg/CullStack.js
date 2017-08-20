@@ -254,33 +254,21 @@ MACROUTILS.createPrototypeObject(
                     var matrix = this._reservedMatrixStack.getOrCreate();
                     mat4.identity(matrix);
 
-                    // TODO: Perf just get World Matrix at each node transform
-                    // store it in a World Transform Node Path (only world matrix change)
-                    // so that it's computed once and reused for each further node getCurrentModel
-                    // otherwise, it's 1 mult for each node, each matrix node, and each geometry
-                    //matrix = this.getCurrentModelMatrix();
-                    // tricky: change push be before isculled, and pop in case of culling
-                    // strange bug for now on frustum culling sample with that
-
+                    var maxNodePathLength = nodePath.length;
                     if (node instanceof Transform) {
-                        // tricky: MatrixTransform getBound is already transformed to
+                        // MatrixTransform getBound is already transformed to
                         // its local space whereas nodepath also have its matrix ...
                         // so to get world space, you HAVE to remove that matrix from nodePATH
-                        // TODO: GC Perf of array slice creating new array
-                        matrix = ComputeMatrixFromNodePath.computeLocalToWorld(
-                            nodePath.slice(0, nodePath.length - 1),
-                            true,
-                            matrix
-                        );
-                    } else {
-                        matrix = ComputeMatrixFromNodePath.computeLocalToWorld(
-                            nodePath,
-                            true,
-                            matrix
-                        );
+                        maxNodePathLength--;
                     }
 
-                    // Matrix.transformBoundingSphere( matrix, node.getBound(), bsWorld );
+                    ComputeMatrixFromNodePath.computeLocalToWorld(
+                        nodePath,
+                        true,
+                        matrix,
+                        maxNodePathLength
+                    );
+
                     node.getBound().transformMat4(bsWorld, matrix);
 
                     return this.getCurrentCullingSet().isBoundingSphereCulled(bsWorld);

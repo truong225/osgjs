@@ -6,6 +6,7 @@ var MatrixMemoryPool = require('osg/MatrixMemoryPool');
 var Transform = require('osg/Transform');
 var NodeVisitor = require('osg/NodeVisitor');
 var MACROUTILS = require('osg/Utils');
+var TemplatePool = require('osg/TemplatePool');
 
 var ComputeBoundsVisitor = function(traversalMode) {
     NodeVisitor.call(this, traversalMode);
@@ -14,7 +15,7 @@ var ComputeBoundsVisitor = function(traversalMode) {
     this._reservedMatrixStack = new MatrixMemoryPool();
 
     // Matrix stack along path traversal
-    this._matrixStack = [];
+    this._matrixStack = new TemplatePool();
     this._bb = new BoundingBox();
 };
 
@@ -23,7 +24,7 @@ MACROUTILS.createPrototypeObject(
     MACROUTILS.objectInherit(NodeVisitor.prototype, {
         reset: function() {
             this._reservedMatrixStack.reset();
-            this._matrixStack.length = 0;
+            this._matrixStack.reset();
             this._bb.init();
         },
 
@@ -38,10 +39,10 @@ MACROUTILS.createPrototypeObject(
         //applyDrawable: function ( drawable ) {},
 
         applyTransform: function(transform) {
-            var matrix = this._reservedMatrixStack.get();
-            var stackLength = this._matrixStack.length;
+            var matrix = this._reservedMatrixStack.getOrCreate();
+            var stackLength = this._matrixStack._length;
 
-            if (stackLength) mat4.copy(matrix, this._matrixStack[stackLength - 1]);
+            if (stackLength) mat4.copy(matrix, this._matrixStack.back());
             else mat4.identity(matrix);
 
             transform.computeLocalToWorldMatrix(matrix, this);
@@ -77,11 +78,11 @@ MACROUTILS.createPrototypeObject(
             var bbOut = new BoundingBox();
 
             return function(bbox) {
-                var stackLength = this._matrixStack.length;
+                var stackLength = this._matrixStack._length;
 
                 if (!stackLength) this._bb.expandByBoundingBox(bbox);
                 else if (bbox.valid()) {
-                    var matrix = this._matrixStack[stackLength - 1];
+                    var matrix = this._matrixStack.back();
                     //Matrix.transformBoundingBox( matrix, bbox, bbOut );
                     bbox.transformMat4(bbOut, matrix);
                     this._bb.expandByBoundingBox(bbOut);

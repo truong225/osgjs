@@ -200,9 +200,7 @@ module.exports = function() {
             var resultProjection;
 
             var popProjectionMatrix = function() {
-                resultProjection = this._projectionMatrixStack[
-                    this._projectionMatrixStack.length - 1
-                ];
+                resultProjection = this._projectionMatrixStack.back();
                 CullVisitor.prototype.popProjectionMatrix.call(this);
             };
             CullVisitor.prototype.setCullSettings = setCullSettings;

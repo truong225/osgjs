@@ -10,7 +10,6 @@ var MatrixTransform = require('osg/MatrixTransform');
 var AutoTransform = require('osg/AutoTransform');
 var Projection = require('osg/Projection');
 var LightSource = require('osg/LightSource');
-var osgPool = require('osgUtil/osgPool');
 var cullVisitorHelper = require('osg/cullVisitorHelper');
 var Geometry = require('osg/Geometry');
 var RenderLeaf = require('osg/RenderLeaf');
@@ -28,7 +27,6 @@ var RigGeometry = require('osgAnimation/RigGeometry');
 var Bone = require('osgAnimation/Bone');
 var MorphGeometry = require('osgAnimation/MorphGeometry');
 var TemplatePool = require('osg/TemplatePool');
-
 
 var createRenderLeaf = function() {
     return new RenderLeaf();
