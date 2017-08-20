@@ -31,7 +31,6 @@ MACROUTILS.createPrototypeObject(
     MACROUTILS.objectInherit(RenderBin.prototype, {
         init: function() {
             RenderBin.prototype.init.call(this);
-            this.positionedAttribute.length = 0;
             this.clearDepth = 1.0;
             vec4.set(this.clearColor, 0.0, 0.0, 0.0, 1.0);
             /*jshint bitwise: false */
@@ -90,10 +89,6 @@ MACROUTILS.createPrototypeObject(
 
         getCamera: function() {
             return this.camera;
-        },
-
-        getPositionedAttribute: function() {
-            return this.positionedAttribute;
         },
 
         getPreRenderStageList: function() {
@@ -289,8 +284,8 @@ MACROUTILS.createPrototypeObject(
                 gl.clear(this.clearMask);
             }
 
-            if (this.positionedAttribute.length !== 0) {
-                this.applyPositionedAttribute(state, this.positionedAttribute);
+            if (this._positionedAttribute._length !== 0) {
+                this.applyPositionedAttribute(state, this._positionedAttribute);
             }
 
             var previousLeaf = RenderBin.prototype.drawImplementation.call(

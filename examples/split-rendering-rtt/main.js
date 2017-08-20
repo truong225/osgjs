@@ -300,8 +300,8 @@
             this.useOpaqueRTT(state);
             this.clearCameraColor(gl);
 
-            if (this.positionedAttribute.length !== 0) {
-                this.applyPositionedAttribute(state, this.positionedAttribute);
+            if (this._positionedAttribute._length !== 0) {
+                this.applyPositionedAttribute(state, this._positionedAttribute);
             }
 
             this.sortBinArray();

@@ -206,7 +206,7 @@ MACROUTILS.createPrototypeObject(
             // in osg you can push 0, in this case an identity matrix will be loaded
             addPositionedAttribute: function(matrix, attribute) {
                 var m = matrix ? matrix : this._identityMatrix;
-                this._currentRenderBin.getStage().positionedAttribute.push([m, attribute]);
+                this._currentRenderBin.getStage().addPositionAttribute(m, attribute);
             },
 
             pushStateSet: function(stateset) {

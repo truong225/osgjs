@@ -3,6 +3,11 @@ var MACROUTILS = require('osg/Utils');
 var Notify = require('osg/notify');
 var Object = require('osg/Object');
 var osgMath = require('osg/math');
+var TemplatePool = require('osg/TemplatePool');
+
+var positionAttribute = function() {
+    return new Array(2);
+};
 
 /**
  * RenderBin base class. Renderbin contains geometries to be rendered as a group,
@@ -16,7 +21,8 @@ var RenderBin = function(sortMode) {
     Object.call(this);
 
     this._leafs = [];
-    this.positionedAttribute = [];
+    this._positionedAttribute = new TemplatePool(positionAttribute);
+
     this.stateGraphList = [];
 
     RenderBin.prototype.init.call(this, sortMode);
@@ -55,7 +61,7 @@ MACROUTILS.createPrototypeObject(
     MACROUTILS.objectInherit(Object.prototype, {
         init: function(sortMode) {
             this._leafs.length = 0;
-            this.positionedAttribute.length = 0;
+            this._positionedAttribute.reset();
             this._renderStage = undefined;
             this._bins = {};
             this.stateGraphList.length = 0;
@@ -80,8 +86,18 @@ MACROUTILS.createPrototypeObject(
             return renderBinConstructor();
         },
 
+        addPositionAttribute: function(m, attribute) {
+            var pa = this._positionedAttribute.getOrCreate();
+            pa[0] = m;
+            pa[1] = attribute;
+        },
+
         getStateGraphList: function() {
             return this.stateGraphList;
+        },
+
+        getPositionedAttribute: function() {
+            return this._positionedAttribute;
         },
 
         copyLeavesFromStateGraphListToRenderLeafList: function() {
@@ -188,7 +204,7 @@ MACROUTILS.createPrototypeObject(
         reset: function() {
             this.stateGraphList.length = 0;
             this._bins = {};
-            this.positionedAttribute.length = 0;
+            this._positionedAttribute.reset();
             this._leafs.length = 0;
             this._sorted = false;
         },
@@ -207,8 +223,9 @@ MACROUTILS.createPrototypeObject(
 
         applyPositionedAttribute: function(state, positionedAttributes) {
             // the idea is to set uniform 'globally' in uniform map.
-            for (var index = 0, l = positionedAttributes.length; index < l; index++) {
-                var element = positionedAttributes[index];
+            var elements = positionedAttributes.getElements();
+            for (var index = 0, l = positionedAttributes._length; index < l; index++) {
+                var element = elements[index];
                 // add or set uniforms in state
                 var stateAttribute = element[1];
                 var matrix = element[0];
