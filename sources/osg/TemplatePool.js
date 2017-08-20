@@ -20,6 +20,7 @@ TemplatePool.prototype = {
     },
     pop: function() {
         this._length--;
+        return this._pool[this._length];
     },
     push: function(value) {
         if (this._length === this._pool.length) {

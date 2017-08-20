@@ -5,7 +5,7 @@ var Object = require('osg/Object');
 var osgMath = require('osg/math');
 var TemplatePool = require('osg/TemplatePool');
 
-var positionAttribute = function() {
+var createPositionAttribute = function() {
     return new Array(2);
 };
 
@@ -21,7 +21,7 @@ var RenderBin = function(sortMode) {
     Object.call(this);
 
     this._leafs = [];
-    this._positionedAttribute = new TemplatePool(positionAttribute);
+    this._positionedAttribute = new TemplatePool(createPositionAttribute);
 
     this.stateGraphList = [];
 
@@ -223,7 +223,7 @@ MACROUTILS.createPrototypeObject(
 
         applyPositionedAttribute: function(state, positionedAttributes) {
             // the idea is to set uniform 'globally' in uniform map.
-            var elements = positionedAttributes.getElements();
+            var elements = positionedAttributes.getArray();
             for (var index = 0, l = positionedAttributes._length; index < l; index++) {
                 var element = elements[index];
                 // add or set uniforms in state

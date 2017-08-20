@@ -1,5 +1,6 @@
 'use strict';
 var mat4 = require('osg/glMatrix').mat4;
+var TemplatePool = require('osg/TemplatePool');
 
 /**
  *  Prevents Memory fragmentation, GC heavy usage
@@ -8,26 +9,9 @@ var mat4 = require('osg/glMatrix').mat4;
  *  @class MatrixMemoryPool
  */
 var MatrixMemoryPool = function() {
-    this._stack = [mat4.create()];
-    this._current = 0;
+    TemplatePool.call(this);
+    this._createFunction = mat4.create;
 };
-
-/** @lends MatrixMemoryPool.prototype */
-MatrixMemoryPool.prototype = {
-    // start reuse the stack
-    reset: function() {
-        this._current = 0;
-    },
-
-    get: function() {
-        var m = this._stack[this._current++];
-
-        if (this._current === this._stack.length) {
-            this._stack.push(mat4.create());
-        }
-
-        return m;
-    }
-};
+MatrixMemoryPool.prototype = TemplatePool.prototype;
 
 module.exports = MatrixMemoryPool;

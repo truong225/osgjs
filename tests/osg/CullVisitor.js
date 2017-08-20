@@ -793,9 +793,9 @@ module.exports = function() {
 
         root.accept(cull);
 
-        assert.isOk(cull._reserveLeafStack.length > 1, 'check we have leaf to validate this test');
-        for (var i = 0; i < cull._reserveLeafStack.length - 1; i++) {
-            checkLeaf(cull._reserveLeafStack[i]);
+        assert.isOk(cull._reserveLeafStack._length > 1, 'check we have leaf to validate this test');
+        for (var i = 0; i < cull._reserveLeafStack._length - 1; i++) {
+            checkLeaf(cull._reserveLeafStack.getArray()[i]);
         }
     });
 };
