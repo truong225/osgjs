@@ -235,7 +235,7 @@ MACROUTILS.createPrototypeObject(
             popStateSet: function() {
                 var currentStateGraph = this._currentStateGraph;
                 var stateset = currentStateGraph.getStateSet();
-                this._currentStateGraph = currentStateGraph.parent;
+                this._currentStateGraph = currentStateGraph.getParent();
                 if (stateset.getBinName() !== undefined) {
                     var renderBinStack = this._renderBinStack;
                     if (renderBinStack._length === 0) {
@@ -453,8 +453,8 @@ MACROUTILS.createPrototypeObject(
             },
 
             pushLeaf: function(node, depth) {
-                var leafs = this._currentStateGraph.leafs;
-                if (leafs.length === 0) {
+                var leafs = this._currentStateGraph.getLeafs();
+                if (!leafs._length) {
                     this._currentRenderBin.addStateGraph(this._currentStateGraph);
                 }
 

@@ -23,7 +23,7 @@ var RenderBin = function(sortMode) {
     this._leafs = [];
     this._positionedAttribute = new TemplatePool(createPositionAttribute);
 
-    this.stateGraphList = [];
+    this._stateGraphList = new TemplatePool();
 
     RenderBin.prototype.init.call(this, sortMode);
 };
@@ -64,7 +64,7 @@ MACROUTILS.createPrototypeObject(
             this._positionedAttribute.reset();
             this._renderStage = undefined;
             this._bins = {};
-            this.stateGraphList.length = 0;
+            this._stateGraphList.reset();
             this._parent = undefined;
             this._binNum = 0;
 
@@ -93,7 +93,7 @@ MACROUTILS.createPrototypeObject(
         },
 
         getStateGraphList: function() {
-            return this.stateGraphList;
+            return this._stateGraphList;
         },
 
         getPositionedAttribute: function() {
@@ -104,8 +104,9 @@ MACROUTILS.createPrototypeObject(
             this._leafs.length = 0;
             var detectedNaN = false;
 
-            for (var i = 0, l = this.stateGraphList.length; i < l; i++) {
-                var leafs = this.stateGraphList[i].leafs;
+            var stateGraphList = this._stateGraphList.getArray();
+            for (var i = 0, l = this._stateGraphList._length; i < l; i++) {
+                var leafs = stateGraphList[i].leafs;
                 for (var j = 0, k = leafs.length; j < k; j++) {
                     var leaf = leafs[j];
                     if (osgMath.isNaN(leaf._depth)) {
@@ -122,7 +123,7 @@ MACROUTILS.createPrototypeObject(
                 );
             }
             // empty the render graph list to prevent it being drawn along side the render leaf list (see drawImplementation.)
-            this.stateGraphList.splice(0, this.stateGraphList.length);
+            this._stateGraphList.reset();
         },
 
         getSortMode: function() {
@@ -198,11 +199,11 @@ MACROUTILS.createPrototypeObject(
         },
 
         addStateGraph: function(sg) {
-            this.stateGraphList.push(sg);
+            this._stateGraphList.push(sg);
         },
 
         reset: function() {
-            this.stateGraphList.length = 0;
+            this._stateGraphList.reset();
             this._bins = {};
             this._positionedAttribute.reset();
             this._leafs.length = 0;
@@ -270,7 +271,8 @@ MACROUTILS.createPrototypeObject(
         },
 
         drawLeafs: function(state, previousRenderLeaf) {
-            var stateList = this.stateGraphList;
+            var stateList = this._stateGraphList.getArray();
+            var stateListLength = this._stateGraphList._length;
             var leafs = this._leafs;
             var previousLeaf = previousRenderLeaf;
             var leaf;
@@ -283,11 +285,11 @@ MACROUTILS.createPrototypeObject(
             }
 
             // draw coarse grained ordering.
-            for (var i = 0, l = stateList.length; i < l; i++) {
+            for (var i = 0, l = stateListLength; i < l; i++) {
                 var sg = stateList[i];
-
-                for (var j = 0, ll = sg.leafs.length; j < ll; j++) {
-                    leaf = sg.leafs[j];
+                var leafArray = sg._leafs.getArray();
+                for (var j = 0, ll = sg._leafs._length; j < ll; j++) {
+                    leaf = leafArray[j];
                     leaf.render(state, previousLeaf);
                     previousLeaf = leaf;
                 }

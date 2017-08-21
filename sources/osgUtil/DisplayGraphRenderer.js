@@ -86,8 +86,10 @@ DisplayGraphRenderer.prototype = {
         }
 
         // register coarse grained leafs
-        for (var k = 0, nk = rb.stateGraphList.length; k < nk; k++) {
-            var sg = rb.stateGraphList[k];
+        var stateGraphList = rb.getStateGraphList();
+        var stateArray = stateGraphList.getArray();
+        for (var k = 0, nk = stateGraphList._length; k < nk; k++) {
+            var sg = stateArray[k];
             this.createNodeAndSetID(childID, sg);
             var stateGraphID = sg._instanceID;
             for (var l = 0, nl = sg.leafs.length; l < nl; l++)
