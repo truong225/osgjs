@@ -288,7 +288,8 @@
             var fbo = this.getCamera().frameBufferObject;
             if (!fbo) this.createCamera2RTT(state);
 
-            if (this.getViewport() === undefined) osg.log('RenderStage does not have a valid viewport');
+            if (this.getViewport() === undefined)
+                osg.log('RenderStage does not have a valid viewport');
 
             state.applyAttribute(this.getViewport());
 

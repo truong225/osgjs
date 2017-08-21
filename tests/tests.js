@@ -1,4 +1,4 @@
-var OSG = require('OSG');
+require('OSG');
 
 var osg = require('tests/osg/osgTests');
 var osgAnimation = require('tests/osgAnimation/osgAnimationTests');
