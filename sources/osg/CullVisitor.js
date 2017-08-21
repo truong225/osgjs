@@ -195,7 +195,7 @@ MACROUTILS.createPrototypeObject(
                 for (var key in this._reserveRenderStageStacks) {
                     this._reserveRenderStageStacks[key].reset();
                 }
-                RenderBin.resetStack();
+                RenderBin.reset();
 
                 this._computedNear = Number.POSITIVE_INFINITY;
                 this._computedFar = Number.NEGATIVE_INFINITY;

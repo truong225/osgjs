@@ -20,11 +20,17 @@ var createPositionAttribute = function() {
 var RenderBin = function(sortMode) {
     Object.call(this);
 
+    this._renderStage = undefined;
+    this._parent = undefined;
+    this._binNum = 0;
+    this._sorted = false;
+    this._sortMode = sortMode !== undefined ? sortMode : RenderBin.defaultSortMode;
+    this._drawCallback = undefined;
     this._leafs = [];
     this._positionedAttribute = new TemplatePool(createPositionAttribute);
-
     this._stateGraphList = new TemplatePool();
-
+    this._binsKeys = new TemplatePool();
+    this._bins = {};
     RenderBin.prototype.init.call(this, sortMode);
 };
 
@@ -35,12 +41,17 @@ RenderBin.SORT_FRONT_TO_BACK = 2;
 // change it at runtime for default RenderBin if needed
 RenderBin.defaultSortMode = RenderBin.SORT_BY_STATE;
 
+var createRenderBin = function() {
+    return new RenderBin();
+};
+var renderBinPool = new TemplatePool(createRenderBin);
+
 RenderBin.BinPrototypes = {
     RenderBin: function() {
-        return RenderBin.getOrCreate().init();
+        return renderBinPool.getOrCreate().init();
     },
     DepthSortedBin: function() {
-        return RenderBin.getOrCreate().init(RenderBin.SORT_BACK_TO_FRONT);
+        return renderBinPool.getOrCreate().init(RenderBin.SORT_BACK_TO_FRONT);
     }
 };
 
@@ -60,22 +71,26 @@ MACROUTILS.createPrototypeObject(
     RenderBin,
     MACROUTILS.objectInherit(Object.prototype, {
         init: function(sortMode) {
-            this._leafs.length = 0;
-            this._positionedAttribute.reset();
             this._renderStage = undefined;
-            this._bins = {};
-            this._stateGraphList.reset();
             this._parent = undefined;
             this._binNum = 0;
-
-            this._sorted = false;
             this._sortMode = sortMode !== undefined ? sortMode : RenderBin.defaultSortMode;
-
             this._drawCallback = undefined;
-
+            RenderBin.prototype._initInternal.call(this);
             return this;
         },
-
+        _initInternal: function() {
+            var binsArray = this._binsKeys.getArray();
+            for (var i = 0, l = this._binsKeys._length; i < l; i++) {
+                var index = binsArray[i];
+                this._bins[index] = undefined;
+            }
+            this._binsKeys.reset();
+            this._stateGraphList.reset();
+            this._positionedAttribute.reset();
+            this._leafs.length = 0;
+            this._sorted = false;
+        },
         _createRenderBin: function(binName) {
             // default render bin constructor
             var renderBinConstructor = RenderBin.BinPrototypes.RenderBin;
@@ -106,9 +121,10 @@ MACROUTILS.createPrototypeObject(
 
             var stateGraphList = this._stateGraphList.getArray();
             for (var i = 0, l = this._stateGraphList._length; i < l; i++) {
-                var leafs = stateGraphList[i].leafs;
-                for (var j = 0, k = leafs.length; j < k; j++) {
-                    var leaf = leafs[j];
+                var leafs = stateGraphList[i]._leafs;
+                var leafsArray = leafs.getArray();
+                for (var j = 0, k = leafs._length; j < k; j++) {
+                    var leaf = leafsArray[j];
                     if (osgMath.isNaN(leaf._depth)) {
                         detectedNaN = true;
                     } else {
@@ -156,11 +172,11 @@ MACROUTILS.createPrototypeObject(
         },
 
         sort: function() {
-            if (this._sorted) {
-                return;
-            }
+            if (this._sorted) return;
 
-            for (var keyBin in this._bins) {
+            var binsKeyArray = this._binsKeys.getArray();
+            for (var i = 0, l = this._binsKeys._length; i < l; i++) {
+                var keyBin = binsKeyArray[i];
                 this._bins[keyBin].sort();
             }
             this.sortImplementation();
@@ -189,6 +205,7 @@ MACROUTILS.createPrototypeObject(
                 bin._binNum = binNum;
                 bin._renderStage = this._renderStage;
                 this._bins[binNum] = bin;
+                this._binsKeys.push(binNum);
             }
 
             return bin;
@@ -203,11 +220,7 @@ MACROUTILS.createPrototypeObject(
         },
 
         reset: function() {
-            this._stateGraphList.reset();
-            this._bins = {};
-            this._positionedAttribute.reset();
-            this._leafs.length = 0;
-            this._sorted = false;
+            RenderBin.prototype._initInternal.call(this);
         },
 
         draw: function(state, previousRenderLeaf) {
@@ -241,7 +254,9 @@ MACROUTILS.createPrototypeObject(
             var previousLeaf = previousRenderLeaf;
 
             var binsArray = [];
-            for (var keyBin in this._bins) {
+            var binsKeysArray = this._binsKeys.getArray();
+            for (var i = 0, l = this._binsKeys._length; i < l; i++) {
+                var keyBin = binsKeysArray[i];
                 binsArray.push(this._bins[keyBin]);
             }
             binsArray.sort(sortBinNumberFunction);
@@ -301,19 +316,8 @@ MACROUTILS.createPrototypeObject(
     'RenderBin'
 );
 
-RenderBin.getOrCreate = function() {
-    var l = RenderBin._reservedStack[RenderBin._reservedStackCurrent++];
-    if (RenderBin._reservedStackCurrent === RenderBin._reservedStack.length) {
-        RenderBin._reservedStack.push(new RenderBin());
-    }
-    return l;
+RenderBin.reset = function() {
+    renderBinPool.reset();
 };
-
-RenderBin.resetStack = function() {
-    RenderBin._reservedStackCurrent = 0;
-};
-
-RenderBin._reservedStack = [new RenderBin()];
-RenderBin._reservedStackCurrent = 0;
 
 module.exports = RenderBin;

@@ -284,9 +284,7 @@ module.exports = function() {
             var resultProjection;
 
             var popProjectionMatrix = function() {
-                resultProjection = this._projectionMatrixStack[
-                    this._projectionMatrixStack.length - 1
-                ];
+                resultProjection = this.getCurrentProjectionMatrix();
                 CullVisitor.prototype.popProjectionMatrix.call(this);
             };
 
@@ -399,9 +397,7 @@ module.exports = function() {
             var resultProjection;
 
             var popProjectionMatrix = function() {
-                resultProjection = this._projectionMatrixStack[
-                    this._projectionMatrixStack.length - 1
-                ];
+                resultProjection = this.getCurrentProjectionMatrix();
                 CullVisitor.prototype.popProjectionMatrix.call(this);
             };
 
@@ -544,12 +540,12 @@ module.exports = function() {
 
             assert.isOk(rs._bins['10']._leafs[0]._depth === 10, 'Check transparent bin');
             assert.isOk(
-                rs._bins['10'].getStateGraphList().length === 0,
+                rs._bins['10'].getStateGraphList()._length === 0,
                 'Check transparent bin StateGraphList'
             );
             assert.isOk(rs._leafs.length === 0, 'Check leafs for normal rendering bin');
             assert.isOk(
-                rs.getStateGraphList().length === 1,
+                rs.getStateGraphList()._length === 1,
                 'Check StateGraphList for normal rendering bin'
             );
             mockup.removeCanvas(canvas);
@@ -610,19 +606,22 @@ module.exports = function() {
         })();
 
         (function() {
+            var getFirstPositionedAttribute = function(renderStage) {
+                return renderStage.getPositionedAttribute().getArray()[0][0];
+            };
             var canvas = mockup.createCanvas();
             var viewer = new mockup.Viewer(canvas);
             viewer.init();
 
             viewer.frame();
             var cull = viewer.getCamera().getRenderer()._cullVisitor;
-            var m = cull._currentRenderBin.getStage().positionedAttribute[0][0];
+            var m = getFirstPositionedAttribute(cull._currentRenderBin.getStage());
             // Test for HeadLight, matrix should be identity
             assert.equalVector(m, [1, 0, -0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
             // Test for Sky_Light, matrix != identity
             viewer.setLightingMode(View.LightingMode.SKY_LIGHT);
             viewer.frame();
-            m = cull._currentRenderBin.getStage().positionedAttribute[0][0];
+            m = getFirstPositionedAttribute(cull._currentRenderBin.getStage());
             assert.equalVector(m, [-1, 0, -0, 0, 0, 1, -0, 0, 0, -0, -1, 0, 0, 0, -10, 1]);
 
             mockup.removeCanvas(canvas);

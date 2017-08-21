@@ -41,7 +41,7 @@ var Node = function() {
 
 Node._reservedMatrixStack = new MatrixMemoryPool();
 var nodeGetMat = function() {
-    var mat = Node._reservedMatrixStack.get.bind(Node._reservedMatrixStack);
+    var mat = Node._reservedMatrixStack.getOrCreate.bind(Node._reservedMatrixStack);
     return mat4.identity(mat);
 };
 

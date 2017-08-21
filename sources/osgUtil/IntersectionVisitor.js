@@ -70,7 +70,7 @@ MACROUTILS.createPrototypeObject(
         },
         pushWindowMatrixUsingViewport: function(viewport) {
             this._windowStack.push(
-                viewport.computeWindowMatrix(IntersectionVisitor._reservedMatrixStack.get())
+                viewport.computeWindowMatrix(IntersectionVisitor._reservedMatrixStack.getOrCreate())
             );
         },
         getWindowMatrix: function() {
@@ -136,13 +136,13 @@ MACROUTILS.createPrototypeObject(
             ) {
                 // relative
                 projection = mat4.mul(
-                    IntersectionVisitor._reservedMatrixStack.get(),
+                    IntersectionVisitor._reservedMatrixStack.getOrCreate(),
                     this.getProjectionMatrix(),
                     camera.getProjectionMatrix()
                 );
                 view = this.getViewMatrix();
                 model = mat4.mul(
-                    IntersectionVisitor._reservedMatrixStack.get(),
+                    IntersectionVisitor._reservedMatrixStack.getOrCreate(),
                     this.getModelMatrix(),
                     camera.getViewMatrix()
                 );
@@ -150,7 +150,7 @@ MACROUTILS.createPrototypeObject(
                 // absolute
                 projection = camera.getProjectionMatrix();
                 view = camera.getViewMatrix();
-                model = mat4.identity(IntersectionVisitor._reservedMatrixStack.get());
+                model = mat4.identity(IntersectionVisitor._reservedMatrixStack.getOrCreate());
             }
 
             this.pushProjectionMatrix(projection);
@@ -190,12 +190,12 @@ MACROUTILS.createPrototypeObject(
             if (!this.enter(node)) return;
             // Accumulate Transform
             if (node.getReferenceFrame() === TransformEnums.ABSOLUTE_RF) {
-                var matrix = IntersectionVisitor._reservedMatrixStack.get();
+                var matrix = IntersectionVisitor._reservedMatrixStack.getOrCreate();
                 this.pushViewMatrix(mat4.identity(matrix));
                 this.pushModelMatrix(node.getMatrix());
             } else if (this._modelStack.length > 0) {
                 var m = mat4.copy(
-                    IntersectionVisitor._reservedMatrixStack.get(),
+                    IntersectionVisitor._reservedMatrixStack.getOrCreate(),
                     this.getModelMatrix()
                 );
                 mat4.mul(m, m, node.getMatrix());

@@ -145,7 +145,11 @@
             osg.mat4.mul(
                 mat,
                 mat,
-                osg.computeLocalToWorld(hit._nodePath.slice(1), true, myReservedMatrixStack.get())
+                osg.computeLocalToWorld(
+                    hit._nodePath.slice(1),
+                    true,
+                    myReservedMatrixStack.getOrCreate()
+                )
             );
 
             var pt = [0.0, 0.0, 0.0];
@@ -205,7 +209,7 @@
                 osg.computeLocalToWorld(
                     hits[0]._nodePath.slice(1),
                     true,
-                    myReservedMatrixStack.get()
+                    myReservedMatrixStack.getOrCreate()
                 )
             );
 

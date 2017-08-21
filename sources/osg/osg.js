@@ -71,7 +71,6 @@ var Uniform = require('osg/Uniform');
 var UpdateVisitor = require('osg/UpdateVisitor');
 var MACROUTILS = require('osg/Utils');
 var Viewport = require('osg/Viewport');
-var osgPool = require('osgUtil/osgPool');
 var Scissor = require('osg/Scissor');
 var TransformEnums = require('osg/transformEnums');
 var Timer = require('osg/Timer');
@@ -162,8 +161,6 @@ osg.vec4 = glm.vec4;
 osg.quat = glm.quat;
 osg.mat3 = glm.mat3;
 osg.mat4 = glm.mat4;
-
-osg.memoryPools = osgPool.memoryPools;
 
 osg.Transform.RELATIVE_RF = TransformEnums.RELATIVE_RF;
 osg.Transform.ABSOLUTE_RF = TransformEnums.ABSOLUTE_RF;

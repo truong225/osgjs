@@ -74,7 +74,9 @@ DisplayGraphRenderer.prototype = {
 
         // register bins
         var bins = rb._bins;
-        for (var binKey in bins) {
+        var binsKeysArray = rb._binsKeys.getArray();
+        for (var i = 0, il = rb._binsKeys._length; i < il; i++) {
+            var binKey = binsKeysArray[i];
             this.apply(bins[binKey]);
         }
 
@@ -92,8 +94,10 @@ DisplayGraphRenderer.prototype = {
             var sg = stateArray[k];
             this.createNodeAndSetID(childID, sg);
             var stateGraphID = sg._instanceID;
-            for (var l = 0, nl = sg.leafs.length; l < nl; l++)
-                this.createNodeAndSetID(stateGraphID, sg.leafs[l]);
+            var leafsPool = sg.getLeafs();
+            var leafsArray = leafsPool.getArray();
+            for (var l = 0, nl = leafsPool._length; l < nl; l++)
+                this.createNodeAndSetID(stateGraphID, leafsArray[l]);
         }
 
         // no parent no link
@@ -153,7 +157,7 @@ DisplayGraphRenderer.prototype = {
         var instanceID = node._instanceID;
         var className = 'StateGraph';
         var label = className + ' ( ' + node._instanceID + ' )';
-        label += '\n' + node.leafs.length + ' leafs';
+        label += '\n' + node._leafs._length + ' leafs';
 
         this._selectables.set(instanceID.toString(), node);
         g.addNode(instanceID, {
@@ -206,8 +210,7 @@ DisplayGraphRenderer.prototype = {
             // detect if RenderLeaf
             if (node._geometry && node._depth !== undefined) {
                 this.generateRenderLeaf(g, node);
-            } else if (node.depth !== undefined && node.leafs && node.children) {
-                // it's StateGraph
+            } else if (node.className() === 'StateGraph') {
                 this.generateStateGraph(g, node);
             } else if (node.className() === 'RenderStage') {
                 this.generateRenderStage(g, node);

@@ -1,4 +1,5 @@
 'use strict';
+var MACROUTILS = require('osg/Utils');
 var TemplatePool = require('osg/TemplatePool');
 
 var StateGraph = function() {
@@ -22,49 +23,54 @@ StateGraph.reset = function() {
     StateGraph.statsNbMoveStateGraph = 0;
 };
 
-StateGraph.prototype = {
-    clean: function() {
-        this._leafs.reset();
-        var keys = this._childrenKeys.getArray();
-        for (var i = 0, l = this._childrenKeys._length; i < l; i++) {
-            var key = keys[i];
-            this._children[key] = undefined;
-        }
-        this._childrenKeys.reset();
-        this._depth = 0;
-        this._stateset = undefined;
-        this._parent = undefined;
-    },
-    getStateSet: function() {
-        return this._stateset;
-    },
-    getLeafs: function() {
-        return this._leafs;
-    },
-    getParent: function() {
-        return this._parent;
-    },
-    findOrInsert: function(stateset) {
-        // nb call per frame as example: 22 (shadowmap) 55 (pbr) to 512 (performance)
-        // it's called by node that have a stateSet
-        var sg;
-        var stateSetID = stateset.getInstanceID();
+MACROUTILS.createPrototypeObject(
+    StateGraph,
+    {
+        clean: function() {
+            this._leafs.reset();
+            var keys = this._childrenKeys.getArray();
+            for (var i = 0, l = this._childrenKeys._length; i < l; i++) {
+                var key = keys[i];
+                this._children[key] = undefined;
+            }
+            this._childrenKeys.reset();
+            this._depth = 0;
+            this._stateset = undefined;
+            this._parent = undefined;
+        },
+        getStateSet: function() {
+            return this._stateset;
+        },
+        getLeafs: function() {
+            return this._leafs;
+        },
+        getParent: function() {
+            return this._parent;
+        },
+        findOrInsert: function(stateset) {
+            // nb call per frame as example: 22 (shadowmap) 55 (pbr) to 512 (performance)
+            // it's called by node that have a stateSet
+            var sg;
+            var stateSetID = stateset.getInstanceID();
 
-        if (!this._children[stateSetID]) {
-            sg = StateGraph.stateGraphPool.getOrCreate();
-            this._childrenKeys.push(stateSetID);
-            sg.clean();
+            if (!this._children[stateSetID]) {
+                sg = StateGraph.stateGraphPool.getOrCreate();
+                this._childrenKeys.push(stateSetID);
+                sg.clean();
 
-            sg._parent = this;
-            sg._depth = this._depth + 1;
-            sg._stateset = stateset;
-            this._children[stateSetID] = sg;
-        } else {
-            sg = this._children[stateSetID];
+                sg._parent = this;
+                sg._depth = this._depth + 1;
+                sg._stateset = stateset;
+                this._children[stateSetID] = sg;
+            } else {
+                sg = this._children[stateSetID];
+            }
+            return sg;
         }
-        return sg;
-    }
-};
+    },
+    'osg',
+    'StateGraph'
+);
 
 StateGraph.moveStateGraph = function(state, sgCurrentArg, sgNewArg) {
     StateGraph.statsNbMoveStateGraph++;

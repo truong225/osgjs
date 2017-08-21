@@ -38,7 +38,8 @@ var CullStack = function() {
     this._cameraModelViewIndexStack = new TemplatePool();
 
     // contains the id has a key to computed Inverse Matrix
-    this._cameraMatrixInverse = [];
+    this._cameraMatrixInverse = {};
+    this._cameraMatrixInverseKeys = new TemplatePool();
     this._cameraMatrixInverseRoot = undefined;
 };
 
@@ -55,7 +56,14 @@ MACROUTILS.createPrototypeObject(
 
             this._cameraModelViewIndexStack.reset();
             this._cameraIndexStack.reset();
-            this._cameraMatrixInverse.length = 0;
+
+            var keysArray = this._cameraMatrixInverseKeys.getArray();
+            for (var i = 0, l = this._cameraMatrixInverseKeys._length; i < l; i++) {
+                var key = keysArray[i];
+                this._cameraMatrixInverse[key] = undefined;
+            }
+            this._cameraMatrixInverseKeys.reset();
+
             this._cameraMatrixInverseRoot = undefined;
         },
 
@@ -89,6 +97,7 @@ MACROUTILS.createPrototypeObject(
                 var matInverse = this._reservedMatrixStack.getOrCreate();
                 mat4.invert(matInverse, mat);
                 this._cameraMatrixInverse[id] = matInverse;
+                this._cameraMatrixInverseKeys.push(id);
             }
             return this._cameraMatrixInverse[id];
         },

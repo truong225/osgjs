@@ -11,9 +11,6 @@ var osgShadow = require('tests/osgShadow/osgShadowTests');
 var osgText = require('tests/osgText/osgTextTests');
 var osgWrappers = require('tests/osgWrappers/osgWrappersTests');
 
-// hack because of osgPool
-OSG.osg.init();
-
 suite('osgWrappers');
 osgWrappers();
 
