@@ -492,11 +492,11 @@ module.exports = function() {
             node3.accept(cull);
             rs.sort();
 
-            assert.isOk(rs._bins['0']._leafs[2]._depth === -15, 'Check depth of leaf 0');
-            assert.isOk(rs._bins['0']._leafs[1]._depth === -10, 'Check depth of leaf 1');
-            assert.isOk(rs._bins['0']._leafs[0]._depth === 5, 'Check depth of leaf 2');
+            assert.isOk(rs._bins.getMap()['0']._leafs[2]._depth === -15, 'Check depth of leaf 0');
+            assert.isOk(rs._bins.getMap()['0']._leafs[1]._depth === -10, 'Check depth of leaf 1');
+            assert.isOk(rs._bins.getMap()['0']._leafs[0]._depth === 5, 'Check depth of leaf 2');
             assert.isOk(
-                rs._bins['0']._sortMode === RenderBin.SORT_BACK_TO_FRONT,
+                rs._bins.getMap()['0']._sortMode === RenderBin.SORT_BACK_TO_FRONT,
                 'Check RenderBin sort mode'
             );
         })();
@@ -538,14 +538,14 @@ module.exports = function() {
             root.accept(cull);
             rs.sort();
 
-            assert.isOk(rs._bins['10']._leafs[0]._depth === 10, 'Check transparent bin');
+            assert.isOk(rs._bins.getMap()['10']._leafs[0]._depth === 10, 'Check transparent bin');
             assert.isOk(
-                rs._bins['10'].getStateGraphList()._length === 0,
+                rs._bins.getMap()['10'].getStateGraphList().length === 0,
                 'Check transparent bin StateGraphList'
             );
             assert.isOk(rs._leafs.length === 0, 'Check leafs for normal rendering bin');
             assert.isOk(
-                rs.getStateGraphList()._length === 1,
+                rs.getStateGraphList().length === 1,
                 'Check StateGraphList for normal rendering bin'
             );
             mockup.removeCanvas(canvas);
@@ -790,9 +790,9 @@ module.exports = function() {
 
         root.accept(cull);
 
-        assert.isOk(cull._reserveLeafStack._length > 1, 'check we have leaf to validate this test');
-        for (var i = 0; i < cull._reserveLeafStack._length - 1; i++) {
-            checkLeaf(cull._reserveLeafStack.getArray()[i]);
+        assert.isOk(cull._pooledLeaf.length > 1, 'check we have leaf to validate this test');
+        for (var i = 0; i < cull._pooledLeaf.length - 1; i++) {
+            checkLeaf(cull._pooledLeaf._pool[i]);
         }
     });
 };

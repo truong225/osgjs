@@ -75,16 +75,12 @@
         },
 
         sortBinArray: function() {
-            var binsKeys = this._binsKeys.getArray();
-            var bins = this._bins;
-
             var binsArray = this._binArraySorted;
             binsArray.length = 0;
 
-            for (var i = 0, l = this._binsKeys._length; i < l; i++) {
-                var k = binsKeys[i];
-                binsArray.push(bins[k]);
-            }
+            this._bins.forEach(function(key, bin) {
+                binsArray.push(bin);
+            });
 
             binsArray.sort(sortBin);
         },
@@ -301,7 +297,7 @@
             this.useOpaqueRTT(state);
             this.clearCameraColor(gl);
 
-            if (this._positionedAttribute._length !== 0) {
+            if (this._positionedAttribute.length !== 0) {
                 this.applyPositionedAttribute(state, this._positionedAttribute);
             }
 

@@ -2,20 +2,20 @@
 var BoundingBox = require('osg/BoundingBox');
 var Geometry = require('osg/Geometry');
 var mat4 = require('osg/glMatrix').mat4;
-var MatrixMemoryPool = require('osg/MatrixMemoryPool');
 var Transform = require('osg/Transform');
 var NodeVisitor = require('osg/NodeVisitor');
 var MACROUTILS = require('osg/Utils');
-var TemplatePool = require('osg/TemplatePool');
+var PooledArray = require('osg/PooledArray');
+var PooledResource = require('osg/PooledResource');
 
 var ComputeBoundsVisitor = function(traversalMode) {
     NodeVisitor.call(this, traversalMode);
 
     // keep a matrix in memory to avoid to create matrix
-    this._reservedMatrixStack = new MatrixMemoryPool();
+    this._pooledMatrix = new PooledResource(mat4.create);
 
     // Matrix stack along path traversal
-    this._matrixStack = new TemplatePool();
+    this._matrixStack = new PooledArray();
     this._bb = new BoundingBox();
 };
 
@@ -23,7 +23,7 @@ MACROUTILS.createPrototypeObject(
     ComputeBoundsVisitor,
     MACROUTILS.objectInherit(NodeVisitor.prototype, {
         reset: function() {
-            this._reservedMatrixStack.reset();
+            this._pooledMatrix.reset();
             this._matrixStack.reset();
             this._bb.init();
         },
@@ -39,8 +39,8 @@ MACROUTILS.createPrototypeObject(
         //applyDrawable: function ( drawable ) {},
 
         applyTransform: function(transform) {
-            var matrix = this._reservedMatrixStack.getOrCreate();
-            var stackLength = this._matrixStack._length;
+            var matrix = this._pooledMatrix.getOrCreateObject();
+            var stackLength = this._matrixStack.length;
 
             if (stackLength) mat4.copy(matrix, this._matrixStack.back());
             else mat4.identity(matrix);
@@ -78,7 +78,7 @@ MACROUTILS.createPrototypeObject(
             var bbOut = new BoundingBox();
 
             return function(bbox) {
-                var stackLength = this._matrixStack._length;
+                var stackLength = this._matrixStack.length;
 
                 if (!stackLength) this._bb.expandByBoundingBox(bbox);
                 else if (bbox.valid()) {

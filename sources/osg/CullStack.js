@@ -7,39 +7,40 @@ var CullSettings = require('osg/CullSettings');
 var CullingSet = require('osg/CullingSet');
 var mat4 = require('osg/glMatrix').mat4;
 var Plane = require('osg/Plane');
-var MatrixMemoryPool = require('osg/MatrixMemoryPool');
 var Transform = require('osg/Transform');
 var TransformEnums = require('osg/transformEnums');
 var vec3 = require('osg/glMatrix').vec3;
-var TemplatePool = require('osg/TemplatePool');
+var PooledArray = require('osg/PooledArray');
+var PooledResource = require('osg/PooledResource');
+var PooledMap = require('osg/PooledMap');
 
 var createCullingSet = function() {
     return new CullingSet();
 };
 
 var CullStack = function() {
-    this._modelViewMatrixStack = new TemplatePool();
-    this._projectionMatrixStack = new TemplatePool();
-    this._viewportStack = new TemplatePool();
-    this._cullingSetStack = new TemplatePool();
+    this._modelViewMatrixStack = new PooledArray();
+    this._projectionMatrixStack = new PooledArray();
+    this._viewportStack = new PooledArray();
+    this._cullingSetStack = new PooledArray();
     this._frustumVolume = -1.0;
     this._bbCornerFar = 0;
     this._bbCornerNear = 0;
 
     // keep a matrix in memory to avoid to create matrix
-    this._reservedMatrixStack = new MatrixMemoryPool();
+    this._pooledMatrix = new PooledResource(mat4.create);
 
-    this._reserveCullingSetStack = new TemplatePool(createCullingSet);
+    this._pooledCullingSet = new PooledResource(createCullingSet);
 
     // data for caching camera matrix inverse for computation of world/view
     // contains index of the camera node in the nodepath
-    this._cameraIndexStack = new TemplatePool();
+    this._cameraIndexStack = new PooledArray();
+
     // contains index of the camera modelview matrix in the modelViewMatrixStack
-    this._cameraModelViewIndexStack = new TemplatePool();
+    this._cameraModelViewIndexStack = new PooledArray();
 
     // contains the id has a key to computed Inverse Matrix
-    this._cameraMatrixInverse = {};
-    this._cameraMatrixInverseKeys = new TemplatePool();
+    this._cameraMatrixInverse = new PooledMap();
     this._cameraMatrixInverseRoot = undefined;
 };
 
@@ -51,18 +52,13 @@ MACROUTILS.createPrototypeObject(
             this._projectionMatrixStack.reset();
             this._cullingSetStack.reset();
 
-            this._reservedMatrixStack.reset();
-            this._reserveCullingSetStack.reset();
+            this._pooledMatrix.reset();
+            this._pooledCullingSet.reset();
 
             this._cameraModelViewIndexStack.reset();
             this._cameraIndexStack.reset();
 
-            var keysArray = this._cameraMatrixInverseKeys.getArray();
-            for (var i = 0, l = this._cameraMatrixInverseKeys._length; i < l; i++) {
-                var key = keysArray[i];
-                this._cameraMatrixInverse[key] = undefined;
-            }
-            this._cameraMatrixInverseKeys.reset();
+            this._cameraMatrixInverse.reset();
 
             this._cameraMatrixInverseRoot = undefined;
         },
@@ -83,7 +79,7 @@ MACROUTILS.createPrototypeObject(
             // active camera in absolute reference
 
             // if no index the camera inverse is the root with an fake id
-            if (!this._cameraIndexStack._length) return this._cameraMatrixInverseRoot;
+            if (!this._cameraIndexStack.length) return this._cameraMatrixInverseRoot;
 
             var idx = this._cameraIndexStack.back();
 
@@ -91,22 +87,24 @@ MACROUTILS.createPrototypeObject(
             var camera = this.getNodePath()[idx];
             var id = camera.getInstanceID();
 
-            if (this._cameraMatrixInverse[id] === undefined) {
+            var mapCameraInverse = this._cameraMatrixInverse.getMap();
+            var cameraInverse = mapCameraInverse[id];
+
+            if (cameraInverse === undefined) {
                 var indexInModelViewMatrixStack = this._cameraModelViewIndexStack.back();
                 var mat = this._modelViewMatrixStack.getArray()[indexInModelViewMatrixStack];
-                var matInverse = this._reservedMatrixStack.getOrCreate();
-                mat4.invert(matInverse, mat);
-                this._cameraMatrixInverse[id] = matInverse;
-                this._cameraMatrixInverseKeys.push(id);
+                cameraInverse = this._pooledMatrix.getOrCreateObject();
+                mat4.invert(cameraInverse, mat);
+                this._cameraMatrixInverse.set(id, cameraInverse);
             }
-            return this._cameraMatrixInverse[id];
+            return cameraInverse;
         },
 
         getCurrentModelMatrix: function() {
             // Improvment could be to cache more things
             // and / or use this method only if the shader use it
             var invMatrix = this.getCameraInverseMatrix();
-            var m = this._reservedMatrixStack.getOrCreate();
+            var m = this._pooledMatrix.getOrCreateObject();
             var world = mat4.mul(m, invMatrix, this.getCurrentModelViewMatrix());
             return world;
         },
@@ -115,7 +113,7 @@ MACROUTILS.createPrototypeObject(
             // Improvment could be to cache more things
             // and / or use this method only if the shader use it
             var modelViewMatrixStackArray = this._modelViewMatrixStack.getArray();
-            if (!this._cameraIndexStack._length) return modelViewMatrixStackArray[0];
+            if (!this._cameraIndexStack.length) return modelViewMatrixStackArray[0];
 
             // also we could keep the index of the current to avoid lenght-1 at each access
             // it's implemented in osg like that:
@@ -124,7 +122,7 @@ MACROUTILS.createPrototypeObject(
         },
 
         getViewport: function() {
-            if (this._viewportStack._length === 0) {
+            if (this._viewportStack.length === 0) {
                 return undefined;
             }
             return this._viewportStack.back();
@@ -206,7 +204,7 @@ MACROUTILS.createPrototypeObject(
         })(),
 
         pushCullingSet: function() {
-            var cs = this._reserveCullingSetStack.getOrCreate();
+            var cs = this._pooledCullingSet.getOrCreateObject();
             if (this._enableFrustumCulling) {
                 mat4.getFrustumPlanes(
                     cs.getFrustum().getPlanes(),
@@ -260,7 +258,7 @@ MACROUTILS.createPrototypeObject(
                 if (node.isCullingActive()) {
                     if (this.getCurrentCullingSet().getCurrentResultMask() === 0) return false; // father bounding sphere totally inside
 
-                    var matrix = this._reservedMatrixStack.getOrCreate();
+                    var matrix = this._pooledMatrix.getOrCreateObject();
                     mat4.identity(matrix);
 
                     var maxNodePathLength = nodePath.length;
@@ -307,7 +305,7 @@ MACROUTILS.createPrototypeObject(
                 var length = np.length;
                 if (!length) {
                     // root
-                    var matInverse = this._reservedMatrixStack.getOrCreate();
+                    var matInverse = this._pooledMatrix.getOrCreateObject();
                     mat4.invert(matInverse, matrix);
                     this._cameraMatrixInverseRoot = matInverse;
                 } else {
@@ -317,7 +315,7 @@ MACROUTILS.createPrototypeObject(
                         np[index].getReferenceFrame() === TransformEnums.ABSOLUTE_RF
                     ) {
                         this._cameraIndexStack.push(index);
-                        this._cameraModelViewIndexStack.push(this._modelViewMatrixStack._length);
+                        this._cameraModelViewIndexStack.push(this._modelViewMatrixStack.length);
                     }
                 }
 
@@ -340,14 +338,14 @@ MACROUTILS.createPrototypeObject(
                 // if same index it's a camera and we have to pop it
                 var np = this.getNodePath();
                 var index = np.length - 1;
-                if (this._cameraIndexStack._length && index === this._cameraIndexStack.back()) {
+                if (this._cameraIndexStack.length && index === this._cameraIndexStack.back()) {
                     this._cameraIndexStack.pop();
                     this._cameraModelViewIndexStack.pop();
                 }
 
                 this._modelViewMatrixStack.pop();
 
-                if (this._modelViewMatrixStack._length !== 0) {
+                if (this._modelViewMatrixStack.length !== 0) {
                     this.getLookVectorLocal(lookVector);
                 } else {
                     vec3.set(lookVector, 0.0, 0.0, -1.0);

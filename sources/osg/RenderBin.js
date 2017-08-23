@@ -3,7 +3,9 @@ var MACROUTILS = require('osg/Utils');
 var Notify = require('osg/notify');
 var Object = require('osg/Object');
 var osgMath = require('osg/math');
-var TemplatePool = require('osg/TemplatePool');
+var PooledResource = require('osg/PooledResource');
+var PooledArray = require('osg/PooledArray');
+var PooledMap = require('osg/PooledMap');
 
 var createPositionAttribute = function() {
     return new Array(2);
@@ -27,10 +29,10 @@ var RenderBin = function(sortMode) {
     this._sortMode = sortMode !== undefined ? sortMode : RenderBin.defaultSortMode;
     this._drawCallback = undefined;
     this._leafs = [];
-    this._positionedAttribute = new TemplatePool(createPositionAttribute);
-    this._stateGraphList = new TemplatePool();
-    this._binsKeys = new TemplatePool();
-    this._bins = {};
+    this._pooledPositionedAttribute = new PooledResource(createPositionAttribute);
+    this._positionedAttribute = new PooledArray();
+    this._stateGraphList = new PooledArray();
+    this._bins = new PooledMap();
     RenderBin.prototype.init.call(this, sortMode);
 };
 
@@ -44,14 +46,14 @@ RenderBin.defaultSortMode = RenderBin.SORT_BY_STATE;
 var createRenderBin = function() {
     return new RenderBin();
 };
-var renderBinPool = new TemplatePool(createRenderBin);
+var pooledRenderBin = new PooledResource(createRenderBin);
 
 RenderBin.BinPrototypes = {
     RenderBin: function() {
-        return renderBinPool.getOrCreate().init();
+        return pooledRenderBin.getOrCreateObject().init();
     },
     DepthSortedBin: function() {
-        return renderBinPool.getOrCreate().init(RenderBin.SORT_BACK_TO_FRONT);
+        return pooledRenderBin.getOrCreateObject().init(RenderBin.SORT_BACK_TO_FRONT);
     }
 };
 
@@ -80,14 +82,10 @@ MACROUTILS.createPrototypeObject(
             return this;
         },
         _initInternal: function() {
-            var binsArray = this._binsKeys.getArray();
-            for (var i = 0, l = this._binsKeys._length; i < l; i++) {
-                var index = binsArray[i];
-                this._bins[index] = undefined;
-            }
-            this._binsKeys.reset();
+            this._bins.reset();
             this._stateGraphList.reset();
             this._positionedAttribute.reset();
+            this._pooledPositionedAttribute.reset();
             this._leafs.length = 0;
             this._sorted = false;
         },
@@ -102,9 +100,10 @@ MACROUTILS.createPrototypeObject(
         },
 
         addPositionAttribute: function(m, attribute) {
-            var pa = this._positionedAttribute.getOrCreate();
+            var pa = this._pooledPositionedAttribute.getOrCreateObject();
             pa[0] = m;
             pa[1] = attribute;
+            this._positionedAttribute.push(pa);
         },
 
         getStateGraphList: function() {
@@ -120,10 +119,10 @@ MACROUTILS.createPrototypeObject(
             var detectedNaN = false;
 
             var stateGraphList = this._stateGraphList.getArray();
-            for (var i = 0, l = this._stateGraphList._length; i < l; i++) {
+            for (var i = 0, l = this._stateGraphList.length; i < l; i++) {
                 var leafs = stateGraphList[i]._leafs;
                 var leafsArray = leafs.getArray();
-                for (var j = 0, k = leafs._length; j < k; j++) {
+                for (var j = 0, k = leafs.length; j < k; j++) {
                     var leaf = leafsArray[j];
                     if (osgMath.isNaN(leaf._depth)) {
                         detectedNaN = true;
@@ -174,10 +173,12 @@ MACROUTILS.createPrototypeObject(
         sort: function() {
             if (this._sorted) return;
 
-            var binsKeyArray = this._binsKeys.getArray();
-            for (var i = 0, l = this._binsKeys._length; i < l; i++) {
-                var keyBin = binsKeyArray[i];
-                this._bins[keyBin].sort();
+            var binsKeys = this._bins.getKeys();
+            var binsMap = this._bins.getMap();
+            var binsKeysArray = binsKeys.getArray();
+            for (var i = 0, l = binsKeys.length; i < l; i++) {
+                var keyBin = binsKeysArray[i];
+                binsMap[keyBin].sort();
             }
             this.sortImplementation();
 
@@ -197,17 +198,16 @@ MACROUTILS.createPrototypeObject(
         },
 
         findOrInsert: function(binNum, binName) {
-            var bin = this._bins[binNum];
+            var bins = this._bins.getMap();
+            var bin = bins[binNum];
 
             if (!bin) {
                 bin = this._createRenderBin(binName);
                 bin._parent = this;
                 bin._binNum = binNum;
                 bin._renderStage = this._renderStage;
-                this._bins[binNum] = bin;
-                this._binsKeys.push(binNum);
+                this._bins.set(binNum, bin);
             }
-
             return bin;
         },
 
@@ -238,7 +238,7 @@ MACROUTILS.createPrototypeObject(
         applyPositionedAttribute: function(state, positionedAttributes) {
             // the idea is to set uniform 'globally' in uniform map.
             var elements = positionedAttributes.getArray();
-            for (var index = 0, l = positionedAttributes._length; index < l; index++) {
+            for (var index = 0, l = positionedAttributes.length; index < l; index++) {
                 var element = elements[index];
                 // add or set uniforms in state
                 var stateAttribute = element[1];
@@ -254,10 +254,13 @@ MACROUTILS.createPrototypeObject(
             var previousLeaf = previousRenderLeaf;
 
             var binsArray = [];
-            var binsKeysArray = this._binsKeys.getArray();
-            for (var i = 0, l = this._binsKeys._length; i < l; i++) {
+
+            var bins = this._bins.getMap();
+            var binsKeys = this._bins.getKeys();
+            var binsKeysArray = binsKeys.getArray();
+            for (var i = 0, l = binsKeys.length; i < l; i++) {
                 var keyBin = binsKeysArray[i];
-                binsArray.push(this._bins[keyBin]);
+                binsArray.push(bins[keyBin]);
             }
             binsArray.sort(sortBinNumberFunction);
 
@@ -287,7 +290,7 @@ MACROUTILS.createPrototypeObject(
 
         drawLeafs: function(state, previousRenderLeaf) {
             var stateList = this._stateGraphList.getArray();
-            var stateListLength = this._stateGraphList._length;
+            var stateListLength = this._stateGraphList.length;
             var leafs = this._leafs;
             var previousLeaf = previousRenderLeaf;
             var leaf;
@@ -303,7 +306,7 @@ MACROUTILS.createPrototypeObject(
             for (var i = 0, l = stateListLength; i < l; i++) {
                 var sg = stateList[i];
                 var leafArray = sg._leafs.getArray();
-                for (var j = 0, ll = sg._leafs._length; j < ll; j++) {
+                for (var j = 0, ll = sg._leafs.length; j < ll; j++) {
                     leaf = leafArray[j];
                     leaf.render(state, previousLeaf);
                     previousLeaf = leaf;
@@ -317,7 +320,7 @@ MACROUTILS.createPrototypeObject(
 );
 
 RenderBin.reset = function() {
-    renderBinPool.reset();
+    pooledRenderBin.reset();
 };
 
 module.exports = RenderBin;

@@ -1,12 +1,13 @@
 'use strict';
 var MACROUTILS = require('osg/Utils');
-var TemplatePool = require('osg/TemplatePool');
+var PooledArray = require('osg/PooledArray');
+var PooledMap = require('osg/PooledMap');
+var PooledResource = require('osg/PooledResource');
 
 var StateGraph = function() {
     this._depth = 0;
-    this._children = {};
-    this._childrenKeys = new TemplatePool();
-    this._leafs = new TemplatePool();
+    this._children = new PooledMap();
+    this._leafs = new PooledArray();
     this._stateset = undefined;
     this._parent = undefined;
 };
@@ -15,11 +16,11 @@ var createStateGraph = function() {
     return new StateGraph();
 };
 
-StateGraph.stateGraphPool = new TemplatePool(createStateGraph);
+StateGraph.pooledStateGraph = new PooledResource(createStateGraph);
 StateGraph.statsNbMoveStateGraph = 0;
 
 StateGraph.reset = function() {
-    StateGraph.stateGraphPool.reset();
+    StateGraph.pooledStateGraph.reset();
     StateGraph.statsNbMoveStateGraph = 0;
 };
 
@@ -28,12 +29,7 @@ MACROUTILS.createPrototypeObject(
     {
         clean: function() {
             this._leafs.reset();
-            var keys = this._childrenKeys.getArray();
-            for (var i = 0, l = this._childrenKeys._length; i < l; i++) {
-                var key = keys[i];
-                this._children[key] = undefined;
-            }
-            this._childrenKeys.reset();
+            this._children.reset();
             this._depth = 0;
             this._stateset = undefined;
             this._parent = undefined;
@@ -50,21 +46,19 @@ MACROUTILS.createPrototypeObject(
         findOrInsert: function(stateset) {
             // nb call per frame as example: 22 (shadowmap) 55 (pbr) to 512 (performance)
             // it's called by node that have a stateSet
-            var sg;
             var stateSetID = stateset.getInstanceID();
-
-            if (!this._children[stateSetID]) {
-                sg = StateGraph.stateGraphPool.getOrCreate();
-                this._childrenKeys.push(stateSetID);
+            var childrenMap = this._children.getMap();
+            var sg = childrenMap[stateSetID];
+            if (!sg) {
+                sg = StateGraph.pooledStateGraph.getOrCreateObject();
                 sg.clean();
 
                 sg._parent = this;
                 sg._depth = this._depth + 1;
                 sg._stateset = stateset;
-                this._children[stateSetID] = sg;
-            } else {
-                sg = this._children[stateSetID];
+                this._children.set(stateSetID, sg);
             }
+
             return sg;
         }
     },
@@ -75,6 +69,8 @@ MACROUTILS.createPrototypeObject(
 StateGraph.moveStateGraph = function(state, sgCurrentArg, sgNewArg) {
     StateGraph.statsNbMoveStateGraph++;
     // nb call per frame: 3 (pbr) 10 (shadowmap) 1(performance)
+
+    // check GC
     var stack = [];
     var sgNew = sgNewArg;
     var sgCurrent = sgCurrentArg;
@@ -119,6 +115,7 @@ StateGraph.moveStateGraph = function(state, sgCurrentArg, sgNewArg) {
     }
 
     // use return path to trace back steps to sgNew.
+    // check GC
     stack = [];
 
     // need to pop back up to the same depth as the curr state group.

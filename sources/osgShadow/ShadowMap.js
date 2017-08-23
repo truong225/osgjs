@@ -747,7 +747,7 @@ MACROUTILS.createPrototypeObject(
 
             var lightMatrix;
             var positionedAttributeElements = positionedAttribute.getArray();
-            for (var i = 0; i < positionedAttribute._length; i++) {
+            for (var i = 0; i < positionedAttribute.length; i++) {
                 var pa = positionedAttributeElements[i];
                 var attribute = pa[1];
                 var matrix = pa[0];

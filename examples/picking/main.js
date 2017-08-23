@@ -148,7 +148,7 @@
                 osg.computeLocalToWorld(
                     hit._nodePath.slice(1),
                     true,
-                    myReservedMatrixStack.getOrCreate()
+                    myReservedMatrixStack.getOrCreateObject()
                 )
             );
 

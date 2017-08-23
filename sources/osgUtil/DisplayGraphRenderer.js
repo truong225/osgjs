@@ -74,11 +74,11 @@ DisplayGraphRenderer.prototype = {
 
         // register bins
         var bins = rb._bins;
-        var binsKeysArray = rb._binsKeys.getArray();
-        for (var i = 0, il = rb._binsKeys._length; i < il; i++) {
-            var binKey = binsKeysArray[i];
-            this.apply(bins[binKey]);
-        }
+        bins.forEach(
+            function(key, bin) {
+                this.apply(bin);
+            }.bind(this)
+        );
 
         // register fine grained leafs
         if (rb._leafs.length) {
@@ -87,18 +87,23 @@ DisplayGraphRenderer.prototype = {
             }
         }
 
-        // register coarse grained leafs
-        var stateGraphList = rb.getStateGraphList();
-        var stateArray = stateGraphList.getArray();
-        for (var k = 0, nk = stateGraphList._length; k < nk; k++) {
-            var sg = stateArray[k];
-            this.createNodeAndSetID(childID, sg);
+        var self = this;
+        var context = {};
+
+        var leafFunction = function(leaf) {
+            self.createNodeAndSetID(this.stateGraphID, leaf);
+        }.bind(context);
+
+        var stateGraphFunction = function(sg) {
+            self.createNodeAndSetID(childID, sg);
             var stateGraphID = sg._instanceID;
             var leafsPool = sg.getLeafs();
-            var leafsArray = leafsPool.getArray();
-            for (var l = 0, nl = leafsPool._length; l < nl; l++)
-                this.createNodeAndSetID(stateGraphID, leafsArray[l]);
-        }
+            context.stateGraphID = stateGraphID;
+            leafsPool.forEach(leafFunction);
+        };
+        // register coarse grained leafs
+        var stateGraphList = rb.getStateGraphList();
+        stateGraphList.forEach(stateGraphFunction);
 
         // no parent no link
         if (this._renderBinStack.length < 2) return;

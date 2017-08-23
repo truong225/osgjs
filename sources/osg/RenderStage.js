@@ -5,7 +5,7 @@ var FrameBufferObject = require('osg/FrameBufferObject');
 var Notify = require('osg/notify');
 var RenderBin = require('osg/RenderBin');
 var vec4 = require('osg/glMatrix').vec4;
-var TemplatePool = require('osg/TemplatePool');
+var PooledResource = require('osg/PooledResource');
 
 /**
  * From OpenSceneGraph http://www.openscenegraph.org
@@ -38,7 +38,7 @@ var createRenderStageOrder = function() {
     };
 };
 
-var renderStageOrderPool = new TemplatePool(createRenderStageOrder);
+var pooledRenderStageOrder = new PooledResource(createRenderStageOrder);
 
 MACROUTILS.createPrototypeObject(
     RenderStage,
@@ -63,7 +63,7 @@ MACROUTILS.createPrototypeObject(
         },
 
         reset: function() {
-            renderStageOrderPool.reset();
+            pooledRenderStageOrder.reset();
             RenderBin.prototype.reset.call(this);
             RenderStage.prototype._initInternal.call(this);
         },
@@ -124,7 +124,7 @@ MACROUTILS.createPrototypeObject(
                 }
             }
 
-            var renderStageOrder = renderStageOrderPool.getOrCreate();
+            var renderStageOrder = pooledRenderStageOrder.getOrCreateObject();
             if (i < this._preRenderList.length) {
                 renderStageOrder.order = order;
                 renderStageOrder.renderStage = rs;
@@ -143,16 +143,16 @@ MACROUTILS.createPrototypeObject(
                     break;
                 }
             }
+
+            var renderStageOrder = pooledRenderStageOrder.getOrCreateObject();
             if (i < this._postRenderList.length) {
-                this._postRenderList = this._postRenderList.splice(i, 0, {
-                    order: order,
-                    renderStage: rs
-                });
+                renderStageOrder.order = order;
+                renderStageOrder.renderStage = rs;
+                this._postRenderList = this._postRenderList.splice(i, 0, renderStageOrder);
             } else {
-                this._postRenderList.push({
-                    order: order,
-                    renderStage: rs
-                });
+                renderStageOrder.order = order;
+                renderStageOrder.renderStage = rs;
+                this._postRenderList.push(renderStageOrder);
             }
         },
 
@@ -301,7 +301,7 @@ MACROUTILS.createPrototypeObject(
                 gl.clear(this._clearMask);
             }
 
-            if (this._positionedAttribute._length !== 0) {
+            if (this._positionedAttribute.length !== 0) {
                 this.applyPositionedAttribute(state, this._positionedAttribute);
             }
 

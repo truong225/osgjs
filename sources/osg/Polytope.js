@@ -3,7 +3,7 @@ var Object = require('osg/Object');
 var Plane = require('osg/Plane');
 var MACROUTILS = require('osg/Utils');
 var vec4 = require('osg/glMatrix').vec4;
-var TemplatePool = require('osg/TemplatePool');
+var PooledArray = require('osg/PooledArray');
 
 /*jshint bitwise: false */
 /**
@@ -25,7 +25,7 @@ var Polytope = function() {
     this._vertexList = [];
 
     // stack of clipping masks
-    this._maskStack = new TemplatePool();
+    this._maskStack = new PooledArray();
 
     // init with a clear mask
     this._resultMask = 0;
@@ -85,7 +85,7 @@ MACROUTILS.createPrototypeObject(
 
         setAndTransformProvidingInverse: function(pt, matrix) {
             this._referenceVertexList = pt._referenceVertexList;
-            var polytopBackIndex = this._maskStack._length - 1;
+            var polytopBackIndex = this._maskStack.length - 1;
             var resultMask = pt._maskStack[polytopBackIndex];
             if (resultMask === 0) {
                 this._maskStack.getArray()[polytopBackIndex] = 0;

@@ -78,7 +78,7 @@ MACROUTILS.createPrototypeObject(
         },
 
         applyTransform: function(transform) {
-            var matrix = this._reservedMatrixStack.getOrCreate();
+            var matrix = this._reservedMatrixStack.getOrCreateObject();
             var stackLength = this._matrixStack.length;
             mat4.copy(matrix, this._matrixStack[stackLength - 1]);
             transform.computeLocalToWorldMatrix(matrix, this);

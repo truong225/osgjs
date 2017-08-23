@@ -1,11 +1,11 @@
 'use strict';
 var mat4 = require('osg/glMatrix').mat4;
-var TemplatePool = require('osg/TemplatePool');
+var PooledArray = require('osg/PooledArray');
 
 var MatrixMemoryPool = function() {
-    TemplatePool.call(this);
+    PooledArray.call(this);
     this._createFunction = mat4.create;
 };
-MatrixMemoryPool.prototype = TemplatePool.prototype;
+MatrixMemoryPool.prototype = PooledArray.prototype;
 
 module.exports = MatrixMemoryPool;
