@@ -6,7 +6,7 @@ var Notify = require('osg/notify');
 var Object = require('osg/Object');
 var Program = require('osg/Program');
 var StateAttribute = require('osg/StateAttribute');
-var StackPool = require('osg/StackPool');
+var PooledArray = require('osg/PooledArray');
 var StackObjectPairPool = require('osg/StackObjectPairPool');
 var Uniform = require('osg/Uniform');
 var MACROUTILS = require('osg/Utils');
@@ -77,7 +77,7 @@ var State = function(shaderGeneratorProxy) {
     this._currentVAO = null;
     this._currentIndexVBO = null;
 
-    this._stateSets = new StackPool();
+    this._stateSets = new PooledArray();
     this._shaderGeneratorNames = new StackObjectPairPool();
     this._uniforms = {};
 
@@ -214,7 +214,7 @@ MACROUTILS.createPrototypeObject(
         },
 
         getStateSetStackSize: function() {
-            return this._stateSets._length;
+            return this._stateSets.length;
         },
 
         insertStateSet: (function() {
@@ -224,7 +224,7 @@ MACROUTILS.createPrototypeObject(
                 tmpStack.length = 0;
                 var length = this.getStateSetStackSize();
                 while (length > pos) {
-                    tmpStack.push(this._stateSets._back);
+                    tmpStack.push(this._stateSets.back());
                     this.popStateSet();
                     length--;
                 }
@@ -251,7 +251,7 @@ MACROUTILS.createPrototypeObject(
 
                 // record the StateSet above the one we intend to remove
                 while (length - 1 > pos) {
-                    tmpStack.push(this._stateSets._back);
+                    tmpStack.push(this._stateSets.back());
                     this.popStateSet();
                     length--;
                 }
@@ -583,13 +583,13 @@ MACROUTILS.createPrototypeObject(
         },
 
         popAllStateSets: function() {
-            while (this._stateSets._length) {
+            while (this._stateSets.length) {
                 this.popStateSet();
             }
         },
 
         popStateSet: function() {
-            if (!this._stateSets._length) return;
+            if (!this._stateSets.length) return;
 
             var stateset = this._stateSets.pop();
 
@@ -1389,15 +1389,15 @@ MACROUTILS.createPrototypeObject(
 
         // Use to detect changes in RenderLeaf between call to avoid to applyStateSet
         _setStateSetsDrawID: function(id) {
-            var values = this._stateSets._values;
-            for (var i = 0, nbStateSets = this._stateSets._length; i < nbStateSets; i++) {
+            var values = this._stateSets.getArray();
+            for (var i = 0, nbStateSets = this._stateSets.length; i < nbStateSets; i++) {
                 values[i].setDrawID(id);
             }
         },
 
         _stateSetStackChanged: function(id, nbLast) {
-            var values = this._stateSets._values;
-            var nbStateSets = this._stateSets._length;
+            var values = this._stateSets.getArray();
+            var nbStateSets = this._stateSets.length;
             if (nbLast !== nbStateSets) return true;
 
             for (var i = 0; i < nbStateSets; i++) {

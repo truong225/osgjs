@@ -378,6 +378,10 @@ MACROUTILS.createPrototypeObject(
                 this.applyFunctionArray[node.nodeTypeID].call(this, node);
             },
 
+            createOrReuseRenderLeaf: function() {
+                return this._pooledLeaf.getOrCreateObject();
+            },
+
             createOrReuseRenderStage: function(classInstance) {
                 var type = !classInstance ? 'RenderStage' : classInstance.className();
 
@@ -436,7 +440,7 @@ MACROUTILS.createPrototypeObject(
                     this._currentRenderBin.addStateGraph(this._currentStateGraph);
                 }
 
-                var leaf = this._pooledLeaf.getOrCreateObject();
+                var leaf = this.createOrReuseRenderLeaf();
 
                 leaf.init(
                     this._currentStateGraph,
