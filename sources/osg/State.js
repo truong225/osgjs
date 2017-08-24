@@ -218,10 +218,10 @@ MACROUTILS.createPrototypeObject(
         },
 
         insertStateSet: (function() {
-            var tmpStack = [];
-
+            var tmpStack = new PooledArray();
+            var tmpStackArray = tmpStack.getArray();
             return function(pos, stateSet) {
-                tmpStack.length = 0;
+                tmpStack.reset();
                 var length = this.getStateSetStackSize();
                 while (length > pos) {
                     tmpStack.push(this._stateSets.back());
@@ -232,14 +232,14 @@ MACROUTILS.createPrototypeObject(
                 this.pushStateSet(stateSet);
 
                 for (var i = tmpStack.length - 1; i >= 0; i--) {
-                    this.pushStateSet(tmpStack[i]);
+                    this.pushStateSet(tmpStackArray[i]);
                 }
             };
         })(),
 
         removeStateSet: (function() {
-            var tmpStack = [];
-
+            var tmpStack = new PooledArray();
+            var tmpStackArray = tmpStack.getArray();
             return function(pos) {
                 var length = this.getStateSetStackSize();
                 if (pos >= length) {
@@ -247,7 +247,7 @@ MACROUTILS.createPrototypeObject(
                     return;
                 }
 
-                tmpStack.length = 0;
+                tmpStack.reset();
 
                 // record the StateSet above the one we intend to remove
                 while (length - 1 > pos) {
@@ -261,7 +261,7 @@ MACROUTILS.createPrototypeObject(
 
                 // push back the original ones that were above the remove StateSet
                 for (var i = tmpStack.length - 1; i >= 0; i--) {
-                    this.pushStateSet(tmpStack[i]);
+                    this.pushStateSet(tmpStackArray[i]);
                 }
             };
         })(),
