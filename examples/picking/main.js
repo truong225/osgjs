@@ -125,7 +125,7 @@
         return root;
     };
 
-    var myReservedMatrixStack = new osg.MatrixMemoryPool();
+    var myReservedMatrixStack = new osg.PooledResource(osg.mat4.create);
 
     var projectToScreen = (function() {
         var mat = osg.mat4.create();
@@ -209,7 +209,7 @@
                 osg.computeLocalToWorld(
                     hits[0]._nodePath.slice(1),
                     true,
-                    myReservedMatrixStack.getOrCreate()
+                    myReservedMatrixStack.getOrCreateObject()
                 )
             );
 
