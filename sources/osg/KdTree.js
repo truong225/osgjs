@@ -545,70 +545,17 @@ MACROUTILS.createPrototypeObject(
             return buildTree.build(options, geom);
         },
 
-        intersect: function(functor, node) {
-            if (node._first < 0) {
-                // treat as a leaf
-                var istart = -node._first - 1;
-                var iend = istart + node._second;
-                var vertexIndices = this._vertexIndices;
-                for (var i = istart; i < iend; ++i) {
-                    var primitiveIndex = this._primitiveIndices[i];
-                    var numVertices = vertexIndices[primitiveIndex++];
-                    switch (numVertices) {
-                        case 1:
-                            functor.intersectPoint(
-                                this._vertices,
-                                i,
-                                vertexIndices[primitiveIndex]
-                            );
-                            break;
-                        case 2:
-                            functor.intersectLine(
-                                this._vertices,
-                                i,
-                                vertexIndices[primitiveIndex],
-                                vertexIndices[primitiveIndex + 1]
-                            );
-                            break;
-                        case 3:
-                            functor.intersectTriangle(
-                                this._vertices,
-                                i,
-                                vertexIndices[primitiveIndex],
-                                vertexIndices[primitiveIndex + 1],
-                                vertexIndices[primitiveIndex + 2]
-                            );
-                            break;
-                        default:
-                            notify.warn(
-                                'Warning: KdTree::intersect() encounted unsupported primitive size of ' +
-                                    numVertices
-                            );
-                            break;
-                    }
-                }
-            } else if (functor.enter(node._bb)) {
-                if (node._first > 0) {
-                    this.intersect(functor, this._kdNodes[node._first]);
-                }
-                if (node._second > 0) {
-                    this.intersect(functor, this._kdNodes[node._second]);
-                }
-                functor.leave();
-            }
-        },
-        intersectLineSegment: function(functor, node, ls, le) {
-            var first = node._first;
-            var second = node._second;
+        _intersectFunctor: function(functor, node) {
+            // treat as a leaf
+            var istart = -node._first - 1;
+            var iend = istart + node._second;
+            var vertexIndices = this._vertexIndices;
             var vertices = this._vertices;
-            if (first < 0) {
-                // treat as a leaf
-                var istart = -node._first - 1;
-                var iend = istart + node._second;
-                var vertexIndices = this._vertexIndices;
-                for (var i = istart; i < iend; ++i) {
-                    var primitiveIndex = this._primitiveIndices[i];
-                    primitiveIndex++;
+
+            for (var i = istart; i < iend; ++i) {
+                var primitiveIndex = this._primitiveIndices[i];
+                var numVertices = vertexIndices[primitiveIndex++];
+                if (numVertices === 3) {
                     functor.intersectTriangle(
                         vertices,
                         i,
@@ -616,26 +563,63 @@ MACROUTILS.createPrototypeObject(
                         vertexIndices[primitiveIndex + 1],
                         vertexIndices[primitiveIndex + 2]
                     );
+                } else if (numVertices === 2) {
+                    functor.intersectLine(
+                        vertices,
+                        i,
+                        vertexIndices[primitiveIndex],
+                        vertexIndices[primitiveIndex + 1]
+                    );
+                } else if (numVertices === 1) {
+                    functor.intersectPoint(vertices, i, vertexIndices[primitiveIndex]);
+                } else {
+                    notify.error(
+                        'Warning: KdTree::intersect() encounted unsupported primitive size of ' +
+                            numVertices
+                    );
                 }
-            } else {
-                var s = node._nodeRayStart;
-                var e = node._nodeRayEnd;
+            }
+        },
+
+        intersect: function(functor, node) {
+            if (node._first < 0) {
+                this._intersectFunctor(functor, node);
+                return;
+            }
+
+            if (functor.enter(node._bb)) {
+                if (node._first > 0) {
+                    this.intersect(functor, this._kdNodes[node._first]);
+                }
+
+                if (node._second > 0) {
+                    this.intersect(functor, this._kdNodes[node._second]);
+                }
+                functor.leave();
+            }
+        },
+        intersectLineSegment: function(functor, node, ls, le) {
+            if (node._first < 0) {
+                this._intersectFunctor(functor, node);
+                return;
+            }
+
+            var s = node._nodeRayStart;
+            var e = node._nodeRayEnd;
+            vec3.copy(s, ls);
+            vec3.copy(e, le);
+            var kNodes = this._kdNodes;
+            var kNode;
+            if (node._first > 0) {
+                kNode = kNodes[node._first];
+                if (functor.enter(kNode._bb, s, e)) this.intersectLineSegment(functor, kNode, s, e);
+            }
+
+            if (node._second > 0) {
                 vec3.copy(s, ls);
                 vec3.copy(e, le);
-                var kNodes = this._kdNodes;
-                var kNode;
-                if (first > 0) {
-                    kNode = kNodes[node._first];
-                    if (functor.enter(kNode._bb, s, e))
-                        this.intersectLineSegment(functor, kNode, s, e);
-                }
-                if (second > 0) {
-                    vec3.copy(s, ls);
-                    vec3.copy(e, le);
-                    kNode = kNodes[node._second];
-                    if (functor.enter(kNode._bb, s, e))
-                        this.intersectLineSegment(functor, kNode, s, e);
-                }
+                kNode = kNodes[node._second];
+                if (functor.enter(kNode._bb, s, e)) this.intersectLineSegment(functor, kNode, s, e);
             }
         }
     },

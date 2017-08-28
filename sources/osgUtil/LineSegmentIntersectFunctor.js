@@ -42,6 +42,8 @@ var LineSegmentIntersectFunctor = function() {
     this._dInvY = vec3.create();
     this._dInvZ = vec3.create();
     this._hit = false;
+
+    this._threshold = 0.0;
 };
 
 LineSegmentIntersectFunctor.prototype = {
@@ -49,7 +51,7 @@ LineSegmentIntersectFunctor.prototype = {
         this._hit = false;
     },
 
-    set: function(start, end, settings) {
+    set: function(start, end, settings, threshold) {
         this._settings = settings;
         this._start = start;
         this._end = end;
@@ -62,6 +64,8 @@ LineSegmentIntersectFunctor.prototype = {
         if (this._d[0] !== 0.0) vec3.scale(this._dInvX, this._d, 1.0 / this._d[0]);
         if (this._d[1] !== 0.0) vec3.scale(this._dInvY, this._d, 1.0 / this._d[1]);
         if (this._d[2] !== 0.0) vec3.scale(this._dInvZ, this._d, 1.0 / this._d[2]);
+
+        if (threshold !== undefined) this._threshold = threshold;
     },
 
     enter: function(bbox, s, e) {
@@ -239,6 +243,7 @@ LineSegmentIntersectFunctor.prototype = {
             this._hit = true;
         };
     })(),
+
     operatorPoint: function() {
         this._primitiveIndex++;
     },
@@ -251,9 +256,164 @@ LineSegmentIntersectFunctor.prototype = {
         if (this._settings._limitOneIntersection && this._hit) return;
         this.intersect(v0, v1, v2);
     },
-    intersectPoint: function() {},
 
-    intersectLine: function() {},
+    intersectPoint: (function() {
+        var v0 = vec3.create();
+        var tmp = vec3.create();
+        var dir = vec3.create();
+        return function(vertices, primitiveIndex, p0) {
+            if (this._threshold <= 0.0) return;
+
+            if (this._settings._limitOneIntersection && this._hit) return;
+            this._primitiveIndex = primitiveIndex;
+            vec3.set(v0, vertices[3 * p0], vertices[3 * p0 + 1], vertices[3 * p0 + 2]);
+
+            // https://www.geometrictools.com/GTEngine/Include/Mathematics/GteDistPointSegment.h
+
+            vec3.sub(tmp, v0, this._start);
+            vec3.sub(dir, this._end, this._start);
+            // ratio (projection on line)
+            var ratio = vec3.dot(tmp, dir) * this._invLength * this._invLength;
+
+            // compute distance to segment
+            var distToSegment = 1.0;
+            if (ratio < 0.0) distToSegment = vec3.sqrLen(tmp);
+            else if (ratio > 1.0) distToSegment = vec3.sqrtDist(v0, this._end);
+            else distToSegment = vec3.sqrtLen(vec3.scaleAndAdd(tmp, tmp, dir, -ratio));
+
+            if (distToSegment > this._threshold * this._threshold) {
+                return;
+            }
+
+            var intersection = new LineSegmentIntersection(p0, -1, -1, 1.0, 0.0, 0.0);
+            intersection._ratio = ratio;
+            intersection._matrix = mat4.clone(this._settings._intersectionVisitor.getModelMatrix());
+            intersection._nodePath = this._settings._intersectionVisitor.getNodePath().slice();
+            intersection._drawable = this._settings._drawable;
+            intersection._primitiveIndex = this._primitiveIndex;
+            intersection._backface = false;
+            intersection._localIntersectionPoint = vec3.scaleAndAdd(
+                vec3.create(),
+                this._start,
+                dir,
+                ratio
+            );
+            intersection._localIntersectionNormal = vec3.ONE;
+
+            this._settings._lineSegIntersector.getIntersections().push(intersection);
+            this._hit = true;
+        };
+    })(),
+
+    intersectLine: (function() {
+        var v0 = vec3.create();
+        var v1 = vec3.create();
+
+        var u = vec3.create();
+        var v = vec3.create();
+        var w = vec3.create();
+
+        var closest0 = vec3.create();
+        var closest1 = vec3.create();
+
+        return function(vertices, primitiveIndex, p0, p1) {
+            if (this._threshold <= 0.0) return;
+            if (this._settings._limitOneIntersection && this._hit) return;
+            this._primitiveIndex = primitiveIndex;
+            vec3.set(v0, vertices[3 * p0], vertices[3 * p0 + 1], vertices[3 * p0 + 2]);
+            vec3.set(v1, vertices[3 * p1], vertices[3 * p1 + 1], vertices[3 * p1 + 2]);
+
+            // https://www.geometrictools.com/GTEngine/Samples/Geometrics/DistanceSegments3/DistanceSegments3.cpp
+
+            var epsilon = 0.00000001;
+            vec3.sub(u, p1, p0);
+            vec3.sub(v, this._end, this._start);
+            vec3.sub(w, p0, this._start);
+            var a = vec3.dot(u, u);
+            var b = vec3.dot(u, v);
+            var c = vec3.dot(v, v);
+            var d = vec3.dot(u, w);
+            var e = vec3.dot(v, w);
+            var D = vec3.dot(a, c) - vec3.dot(b, b);
+            var sc,
+                sN,
+                sD = D;
+            var tc,
+                tN,
+                tD = D;
+
+            // compute the line parameters of the two closest points
+            if (D < epsilon) {
+                // the lines are almost parallel
+                sN = 0.0; // force using point P0 on segment S1
+                sD = 1.0; // to prevent possible division by 0.0 later
+                tN = e;
+                tD = c;
+            } else {
+                // get the closest points on the infinite lines
+                sN = vec3.dot(b, e) - vec3.dot(c, d);
+                tN = vec3.dot(a, e) - vec3.dot(b, d);
+                if (sN < 0.0) {
+                    // sc < 0 => the s=0 edge is visible
+                    sN = 0.0;
+                    tN = e;
+                    tD = c;
+                } else if (sN > sD) {
+                    // sc > 1  => the s=1 edge is visible
+                    sN = sD;
+                    tN = e + b;
+                    tD = c;
+                }
+            }
+
+            if (tN < 0.0) {
+                // tc < 0 => the t=0 edge is visible
+                tN = 0.0;
+                // recompute sc for this edge
+                if (-d < 0.0) sN = 0.0;
+                else if (-d > a) sN = sD;
+                else {
+                    sN = -d;
+                    sD = a;
+                }
+            } else if (tN > tD) {
+                // tc > 1  => the t=1 edge is visible
+                tN = tD;
+                // recompute sc for this edge
+                if (-d + b < 0.0) sN = 0;
+                else if (-d + b > a) sN = sD;
+                else {
+                    sN = -d + b;
+                    sD = a;
+                }
+            }
+            // finally do the division to get sc and tc
+            sc = Math.abs(sN) < epsilon ? 0.0 : sN / sD;
+            tc = Math.abs(tN) < epsilon ? 0.0 : tN / tD;
+
+            // get the difference of the two closest points
+            vec3.scaleAndAdd(closest0, p0, u, sc);
+            vec3.scaleAndAdd(closest1, this._start, v, tc);
+
+            var sqrDistance = vec3.sqrtDist(closest0, closest1);
+            if (sqrDistance > this._threshold * this._threshold) {
+                return;
+            }
+
+            var intersection = new LineSegmentIntersection(p0, p1, -1, 1.0 - tc, tc, 0.0);
+            intersection._ratio = tc;
+            intersection._matrix = mat4.clone(this._settings._intersectionVisitor.getModelMatrix());
+            intersection._nodePath = this._settings._intersectionVisitor.getNodePath().slice();
+            intersection._drawable = this._settings._drawable;
+            intersection._primitiveIndex = this._primitiveIndex;
+            intersection._backface = false;
+            intersection._localIntersectionPoint = vec3.clone(closest1);
+            intersection._localIntersectionNormal = vec3.ONE;
+
+            this._settings._lineSegIntersector.getIntersections().push(intersection);
+            this._hit = true;
+        };
+    })(),
 
     intersectTriangle: (function() {
         var v0 = vec3.create();
